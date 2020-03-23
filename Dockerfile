@@ -1,6 +1,7 @@
-FROM python:3.8-slim
+FROM python:3.7-slim
 
-LABEL Name=datahub_processor Version=0.0.1
+LABEL Name=measurement_transactions_processor Version=0.0.1
+
 WORKDIR /app
 
 COPY ./requirements.txt requirements.txt
@@ -16,5 +17,4 @@ RUN apt-get update &&\
 
 COPY ./src /app
 
-
-CMD ["python3", "main.py"]
+ENTRYPOINT ["python3", "main.py"]
