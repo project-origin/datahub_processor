@@ -1,24 +1,17 @@
 
 
 import unittest
-import random
-import string
 import json
 
 from datetime import datetime, timezone
 from sawtooth_sdk.processor.exceptions import InvalidTransaction
-from src.datahub_processor.handler import PublishMeasurementTransactionHandler, measurement_schema, Measurement
+from src.datahub_processor.publish_measurement_handler import PublishMeasurementTransactionHandler, measurement_schema, Measurement
 from src.datahub_processor.ledger_dto import MeasurementType
-
+ 
 from .mocks import MockContext, FakeTransaction, FakeTransactionHeader
 
-def randomString(stringLength=32):
-    """Generate a random string of fixed length """
-    letters = string.ascii_lowercase
-    return ''.join(random.choice(letters) for i in range(stringLength))
 
-
-class TestDatahubProcessor(unittest.TestCase):
+class TestPublishMeasurement(unittest.TestCase):
 
     def create_fake_transaction(self, inputs, outputs, payload):
         

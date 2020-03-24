@@ -6,12 +6,12 @@ from json import JSONDecodeError
 from marshmallow_dataclass import class_schema
 from marshmallow import ValidationError
 
+from .generic_handler import GenericHandler
 from .ledger_dto import Measurement, LedgerPublishMeasurementRequest
 
-request_schema = class_schema(LedgerPublishMeasurementRequest)
 measurement_schema = class_schema(Measurement)
 
-class PublishMeasurementTransactionHandler(TransactionHandler):
+class PublishMeasurementTransactionHandler(GenericHandler):
 
     TIMEOUT = 3
 
@@ -20,7 +20,7 @@ class PublishMeasurementTransactionHandler(TransactionHandler):
 
     @property
     def family_name(self):
-        return 'MEASUREMENT'
+        return LedgerPublishMeasurementRequest.__name__
 
     @property
     def family_versions(self):
@@ -34,13 +34,16 @@ class PublishMeasurementTransactionHandler(TransactionHandler):
 
         try:
             self._validate_publickey(transaction.header.signer_public_key)
-            self._check_address_available(transaction, context)
 
-            request = self._validate_payload(transaction.payload)
+            address = transaction.header.outputs[0]
+
+            if self._address_not_empty(context, address):
+                raise InvalidTransaction(f'Address already in use "{address}"!')
+
+            request = self._map_request(LedgerPublishMeasurementRequest, transaction.payload)
             measurement = self._map_measurement(request)
 
             payload = measurement_schema(exclude=["address"]).dumps(measurement).encode('utf8')
-            address = transaction.header.outputs[0]
 
             context.set_state(
                 {address: payload}, 
@@ -55,23 +58,6 @@ class PublishMeasurementTransactionHandler(TransactionHandler):
             print(track)
 
             raise InternalError('an error while parsing the transaction happened')
-
-    def _check_address_available(self, transaction, context):
-        address = transaction.header.outputs[0]
-        states = context.get_state([address])
-
-        if len(states) != 0:
-            raise InvalidTransaction(f'Address already in use "{address}"!')
-
-    def _validate_payload(self, payload: bytes):
-        try:
-            return request_schema().loads(payload.decode('utf8'))
-
-        except ValidationError as err:
-            raise InvalidTransaction(str(err))
-
-        except JSONDecodeError as err:
-            raise InvalidTransaction('The transaction payload was an invalid request. Invalid JSON.')
 
 
     def _map_measurement(self, request: LedgerPublishMeasurementRequest):

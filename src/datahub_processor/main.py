@@ -1,6 +1,6 @@
 import os
 from sawtooth_sdk.processor.core import TransactionProcessor
-from handler import PublishMeasurementTransactionHandler 
+from measurement_handler import PublishMeasurementTransactionHandler 
 
 
 def main():
