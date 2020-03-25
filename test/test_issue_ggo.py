@@ -37,6 +37,7 @@ class TestIssueGGO(unittest.TestCase):
 
         payload = json.dumps({
             "origin":mea_add,
+            "destination": ggo_add,
             "tech_type":"T12412",
             "fuel_type":"F010101",
             "key":"aregaerg"
@@ -50,7 +51,7 @@ class TestIssueGGO(unittest.TestCase):
         with self.assertRaises(InvalidTransaction) as invalid_transaction:
             IssueGGOTransactionHandler().apply(transaction, context)
 
-        self.assertEqual(str(invalid_transaction.exception), 'Address "mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c" does not contain a valid measurement.')
+        self.assertEqual(str(invalid_transaction.exception), 'Address "mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c" does not contain a valid Measurement.')
 
         
     def test_issue_ggo_not_a_measurement(self):
@@ -64,6 +65,7 @@ class TestIssueGGO(unittest.TestCase):
 
         payload = json.dumps({
             "origin": mea_add,
+            "destination": ggo_add,
             "tech_type":"T12412",
             "fuel_type":"F010101",
             "key":"aregaerg"
@@ -77,7 +79,7 @@ class TestIssueGGO(unittest.TestCase):
         with self.assertRaises(InvalidTransaction) as invalid_transaction:
             IssueGGOTransactionHandler().apply(transaction, context)
 
-        self.assertEqual(str(invalid_transaction.exception), 'Address "mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c" does not contain a valid measurement.')
+        self.assertEqual(str(invalid_transaction.exception), 'Address "mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c" does not contain a valid Measurement.')
 
 
     def test_issue_ggo_not_production(self):
@@ -100,6 +102,7 @@ class TestIssueGGO(unittest.TestCase):
 
         payload = json.dumps({
             "origin": mea_add,
+            "destination": ggo_add,
             "tech_type":"T12412",
             "fuel_type":"F010101",
             "key":"03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e"
@@ -136,6 +139,7 @@ class TestIssueGGO(unittest.TestCase):
 
         payload = json.dumps({
             "origin": mea_add,
+            "destination": ggo_add,
             "tech_type":"T12412",
             "fuel_type":"F010101",
             "key":"03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e"
@@ -150,14 +154,16 @@ class TestIssueGGO(unittest.TestCase):
         self.assertIn(ggo_add, context.states)
 
         obj = json.loads(context.states[ggo_add].decode('utf8'))
-        self.assertEqual(len(obj), 7)
+        self.assertEqual(len(obj), 9)
 
+        self.assertEqual(obj['origin'], mea_add)
         self.assertEqual(obj['amount'], 123)
         self.assertEqual(obj['begin'], '2020-01-01T12:00:00+00:00')
         self.assertEqual(obj['end'], '2020-01-01T13:00:00+00:00')
         self.assertEqual(obj['sector'], 'DK1')
         self.assertEqual(obj['tech_type'], 'T12412')
         self.assertEqual(obj['fuel_type'], 'F010101')
+        self.assertEqual(obj['next'], None)
         self.assertEqual(obj['key'], '03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e')
 
 
@@ -181,6 +187,7 @@ class TestIssueGGO(unittest.TestCase):
 
         payload = json.dumps({
             "origin": mea_add,
+            "destination": ggo_add,
             "tech_type":"T12412",
             "fuel_type":"F010101",
             "key":"03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e"

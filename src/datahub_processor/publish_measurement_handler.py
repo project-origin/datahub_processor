@@ -1,10 +1,7 @@
 import os
 import traceback
-from sawtooth_sdk.processor.handler import TransactionHandler
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
-from json import JSONDecodeError
 from marshmallow_dataclass import class_schema
-from marshmallow import ValidationError
 
 from .generic_handler import GenericHandler
 from .ledger_dto import Measurement, LedgerPublishMeasurementRequest
@@ -33,11 +30,11 @@ class PublishMeasurementTransactionHandler(GenericHandler):
     def apply(self, transaction, context):
 
         try:
-            self._validate_publickey(transaction.header.signer_public_key)
+            self.validate_transaction(transaction)
 
             address = transaction.header.outputs[0]
 
-            if self._address_not_empty(context, address):
+            if self._addresses_not_empty(context, [address]):
                 raise InvalidTransaction(f'Address already in use "{address}"!')
 
             request = self._map_request(LedgerPublishMeasurementRequest, transaction.payload)
@@ -70,7 +67,7 @@ class PublishMeasurementTransactionHandler(GenericHandler):
             key=request.key
         )
 
-    def _validate_publickey(self, publickey):
+    def validate_transaction(self, transaction):
         # TODO: validate signer is energinet!!!
         # raise InvalidTransaction('Not valid Guarantee of origin issuer!')
         pass

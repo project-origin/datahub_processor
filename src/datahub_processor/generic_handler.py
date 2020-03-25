@@ -22,25 +22,26 @@ class GenericHandler(TransactionHandler):
             raise InvalidTransaction('The transaction payload was an invalid request. Invalid JSON.')
 
     
-    def _address_not_empty(self, context, address):
-        states = context.get_state([address])
+    def _addresses_not_empty(self, context, addresses):
+        return len(context.get_state(addresses)) != 0
 
-        for entry in states:     
-            if entry.address == address:
-                return True
-        return False
-
-    def _get_measurement(self, context, address) -> Measurement:
+    def _get_type(self, clazz: type, context, address):
         try:    
             states = context.get_state([address])
             for entry in states:     
                 if entry.address == address:
-                    return Measurement.get_schema().loads(entry.data.decode('utf8'))
+                    return clazz.get_schema().loads(entry.data.decode('utf8'))
 
         except JSONDecodeError:
             pass
         except ValidationError:
             pass
 
-        raise InvalidTransaction(f'Address "{address}" does not contain a valid measurement.')
+        raise InvalidTransaction(f'Address "{address}" does not contain a valid {clazz.__name__}.')
 
+
+    def _get_measurement(self, context, address) -> Measurement:
+        return self._get_type(Measurement, context, address)
+
+    def _get_ggo(self, context, address) -> GGO:
+        return self._get_type(GGO, context, address)

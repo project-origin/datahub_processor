@@ -28,21 +28,19 @@ class IssueGGOTransactionHandler(GenericHandler):
     def apply(self, transaction, context):
 
         try:
-            if len(transaction.header.outputs) != 1:
-                raise InvalidTransaction("Only a single output address can be specified in an IssueGGORequest")
-
-            address = transaction.header.outputs[0]
-
-            if self._address_not_empty(context, address):
-                raise InvalidTransaction("GGO already issued!")
-
-            request = self._map_request(LedgerIssueGGORequest, transaction.payload)
+            self.validate_transaction(transaction)
+            
+            request: LedgerIssueGGORequest = self._map_request(LedgerIssueGGORequest, transaction.payload)
             measurement = self._get_measurement(context, request.origin)
+
+            if self._addresses_not_empty(context, [request.destination]):
+                raise InvalidTransaction("GGO already issued!")
 
             if measurement.type != MeasurementType.PRODUCTION:
                 raise InvalidTransaction("Measurement is not of type Production!")
 
             new_ggo = GGO(
+                origin=request.origin,
                 amount=measurement.amount,
                 begin=measurement.begin,
                 end=measurement.end,
@@ -55,7 +53,7 @@ class IssueGGOTransactionHandler(GenericHandler):
             payload = GGO.get_schema().dumps(new_ggo).encode('utf8')
 
             context.set_state(
-                {address: payload}, 
+                {request.destination: payload}, 
                 self.TIMEOUT)
             
         except InvalidTransaction as ex:
@@ -68,4 +66,7 @@ class IssueGGOTransactionHandler(GenericHandler):
 
             raise InternalError('an error while parsing the transaction happened')
 
-      
+    def validate_transaction(self, transaction):
+        # TODO: validate signer is energinet!!!
+        # raise InvalidTransaction('Not valid Guarantee of origin issuer!')
+        pass
