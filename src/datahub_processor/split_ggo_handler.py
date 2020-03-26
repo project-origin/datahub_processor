@@ -1,21 +1,17 @@
 import os
+import hashlib
 import traceback
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 
 from .generic_handler import GenericHandler
-from .ledger_dto import GGO, LedgerSplitGGORequest, GGONext, GGOAction
+from .ledger_dto import GGO, SplitGGORequest, GGONext, GGOAction
 
 
 class SplitGGOTransactionHandler(GenericHandler):
 
-    TIMEOUT = 3
-
-    def __init__(self):
-        self._namespace_prefix = os.getenv('GGOLEDGER_ADDRESS_PREFIX')
-
     @property
     def family_name(self):
-        return LedgerSplitGGORequest.__name__
+        return SplitGGORequest.__name__
 
     @property
     def family_versions(self):
@@ -23,12 +19,14 @@ class SplitGGOTransactionHandler(GenericHandler):
 
     @property
     def namespaces(self):
-        return [self._namespace_prefix]
+        ggo_namespace = hashlib.sha512('ggo'.encode('utf-8')).hexdigest()[0:6]
+        return [ggo_namespace]
+
 
     def apply(self, transaction, context):
 
         try:
-            request: LedgerSplitGGORequest = self._map_request(LedgerSplitGGORequest, transaction.payload)
+            request: SplitGGORequest = self._map_request(SplitGGORequest, transaction.payload)
 
             current_ggo = self._get_ggo(context, request.origin)
 
@@ -71,13 +69,13 @@ class SplitGGOTransactionHandler(GenericHandler):
                 self.TIMEOUT)
             
         except InvalidTransaction as ex:
-            print(ex)
+            track = traceback.format_exc()
+            print("InvalidException", ex)
+            print("InvalidTrack", track)
             raise
             
         except Exception as ex:
             track = traceback.format_exc()
-            print(track)
-
-            raise InternalError('an error while parsing the transaction happened')
-
-      
+            print("Exception", ex)
+            print("Track", track)
+            raise InternalError('An unknown error has occured.')

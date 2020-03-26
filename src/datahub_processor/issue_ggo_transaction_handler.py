@@ -1,21 +1,17 @@
 import os
+import hashlib
 import traceback
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 
 from .generic_handler import GenericHandler
-from .ledger_dto import GGO, LedgerIssueGGORequest, MeasurementType
+from .ledger_dto import GGO, IssueGGORequest, MeasurementType
 
 
 class IssueGGOTransactionHandler(GenericHandler):
 
-    TIMEOUT = 3
-
-    def __init__(self):
-        self._namespace_prefix = os.getenv('GGOLEDGER_ADDRESS_PREFIX')
-
     @property
     def family_name(self):
-        return LedgerIssueGGORequest.__name__
+        return IssueGGORequest.__name__
 
     @property
     def family_versions(self):
@@ -23,14 +19,16 @@ class IssueGGOTransactionHandler(GenericHandler):
 
     @property
     def namespaces(self):
-        return [self._namespace_prefix]
+        ggo_namespace = hashlib.sha512('ggo'.encode('utf-8')).hexdigest()[0:6]
+        return [ggo_namespace]
+
 
     def apply(self, transaction, context):
 
         try:
             self.validate_transaction(transaction)
             
-            request: LedgerIssueGGORequest = self._map_request(LedgerIssueGGORequest, transaction.payload)
+            request: IssueGGORequest = self._map_request(IssueGGORequest, transaction.payload)
             measurement = self._get_measurement(context, request.origin)
 
             if self._addresses_not_empty(context, [request.destination]):
@@ -57,14 +55,16 @@ class IssueGGOTransactionHandler(GenericHandler):
                 self.TIMEOUT)
             
         except InvalidTransaction as ex:
-            print(ex)
+            track = traceback.format_exc()
+            print("InvalidException", ex)
+            print("InvalidTrack", track)
             raise
             
         except Exception as ex:
             track = traceback.format_exc()
-            print(track)
-
-            raise InternalError('an error while parsing the transaction happened')
+            print("Exception", ex)
+            print("Track", track)
+            raise InternalError('An unknown error has occured.')
 
     def validate_transaction(self, transaction):
         # TODO: validate signer is energinet!!!

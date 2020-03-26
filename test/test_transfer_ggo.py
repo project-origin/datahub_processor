@@ -1,9 +1,10 @@
 import unittest
 import json
 from datetime import datetime, timezone
-from src.datahub_processor.ledger_dto import GGO, LedgerTransferGGORequest, GGONext, GGOAction
 
-from sawtooth_sdk.processor.exceptions import InvalidTransaction
+from src.datahub_processor.ledger_dto import GGO, TransferGGORequest, GGONext, GGOAction
+
+from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 from src.datahub_processor.transfer_ggo_handler import TransferGGOTransactionHandler
  
 from .mocks import MockContext, FakeTransaction, FakeTransactionHeader
@@ -28,6 +29,25 @@ class TestIssueGGO(unittest.TestCase):
             header_signature="7651c96e081880de546683b7f47ca9124bd398bb7ad5880813a7cb882d2901e405e386730d8ca04aabdfa354b6b66105b1b7e51141d25bf34a0a245004209e45",
             payload=payload
         )
+
+    def test_identifiers(self):
+        handler = TransferGGOTransactionHandler()   
+        
+        self.assertEqual(handler.family_name, 'TransferGGORequest')
+
+        self.assertEqual(len(handler.family_versions), 1)
+        self.assertIn('0.1', handler.family_versions)
+
+        self.assertEqual(len(handler.namespaces), 1)
+        self.assertIn('2b7eba', handler.namespaces)
+
+    def test_internal_error(self):
+        with self.assertRaises(InternalError) as invalid_transaction:
+            TransferGGOTransactionHandler().apply(None, None)
+
+        self.assertEqual(str(invalid_transaction.exception), 'An unknown error has occured.')
+        
+      
           
     def test_transfer_ggo_success(self):
         
@@ -50,7 +70,7 @@ class TestIssueGGO(unittest.TestCase):
             ggo_src: ggo
         })
 
-        payload = class_schema(LedgerTransferGGORequest)().dumps(LedgerTransferGGORequest(
+        payload = class_schema(TransferGGORequest)().dumps(TransferGGORequest(
             origin=ggo_src,
             destination=ggo_dst,
             key='d3f384923f63906ad06ee903a93d2ee81b14c1b5a20356d6560c99daf6fb19e48e'
@@ -104,7 +124,7 @@ class TestIssueGGO(unittest.TestCase):
         context = MockContext(states={
         })
 
-        payload = class_schema(LedgerTransferGGORequest)().dumps(LedgerTransferGGORequest(
+        payload = class_schema(TransferGGORequest)().dumps(TransferGGORequest(
             origin=ggo_src,
             destination=ggo_dst,
             key='d3f384923f63906ad06ee903a93d2ee81b14c1b5a20356d6560c99daf6fb19e48e'
@@ -143,7 +163,7 @@ class TestIssueGGO(unittest.TestCase):
         })
 
 
-        payload = class_schema(LedgerTransferGGORequest)().dumps(LedgerTransferGGORequest(
+        payload = class_schema(TransferGGORequest)().dumps(TransferGGORequest(
             origin=ggo_src,
             destination=ggo_dst,
             key='d3f384923f63906ad06ee903a93d2ee81b14c1b5a20356d6560c99daf6fb19e48e'
@@ -182,7 +202,7 @@ class TestIssueGGO(unittest.TestCase):
         })
 
 
-        payload = class_schema(LedgerTransferGGORequest)().dumps(LedgerTransferGGORequest(
+        payload = class_schema(TransferGGORequest)().dumps(TransferGGORequest(
             origin=ggo_src,
             destination=ggo_dst,
             key='d3f384923f63906ad06ee903a93d2ee81b14c1b5a20356d6560c99daf6fb19e48e'
@@ -235,7 +255,7 @@ class TestIssueGGO(unittest.TestCase):
             ggo_dst: ggo2
         })
 
-        payload = class_schema(LedgerTransferGGORequest)().dumps(LedgerTransferGGORequest(
+        payload = class_schema(TransferGGORequest)().dumps(TransferGGORequest(
             origin=ggo_src,
             destination=ggo_dst,
             key='d3f384923f63906ad06ee903a93d2ee81b14c1b5a20356d6560c99daf6fb19e48e'

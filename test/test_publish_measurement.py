@@ -4,7 +4,7 @@ import unittest
 import json
 
 from datetime import datetime, timezone
-from sawtooth_sdk.processor.exceptions import InvalidTransaction
+from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 from src.datahub_processor.publish_measurement_handler import PublishMeasurementTransactionHandler, measurement_schema, Measurement
 from src.datahub_processor.ledger_dto import MeasurementType
  
@@ -28,6 +28,26 @@ class TestPublishMeasurement(unittest.TestCase):
             header_signature="7651c96e081880de546683b7f47ca9124bd398bb7ad5880813a7cb882d2901e405e386730d8ca04aabdfa354b6b66105b1b7e51141d25bf34a0a245004209e45",
             payload=payload
         )
+
+
+    def test_identifiers(self):
+        handler = PublishMeasurementTransactionHandler()
+        
+        self.assertEqual(handler.family_name, 'PublishMeasurementRequest')
+
+        self.assertEqual(len(handler.family_versions), 1)
+        self.assertIn('0.1', handler.family_versions)
+
+        self.assertEqual(len(handler.namespaces), 1)
+        self.assertIn('146fca', handler.namespaces)
+
+
+    def test_internal_error(self):
+        with self.assertRaises(InternalError) as invalid_transaction:
+            PublishMeasurementTransactionHandler().apply(None, None)
+
+        self.assertEqual(str(invalid_transaction.exception), 'An unknown error has occured.')
+        
 
 
     def test_publish_measurement(self):

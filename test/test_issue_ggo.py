@@ -1,7 +1,7 @@
 import unittest
 import json
 
-from sawtooth_sdk.processor.exceptions import InvalidTransaction
+from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 from src.datahub_processor.issue_ggo_transaction_handler import IssueGGOTransactionHandler
  
 from .mocks import MockContext, FakeTransaction, FakeTransactionHeader
@@ -25,6 +25,25 @@ class TestIssueGGO(unittest.TestCase):
             header_signature="7651c96e081880de546683b7f47ca9124bd398bb7ad5880813a7cb882d2901e405e386730d8ca04aabdfa354b6b66105b1b7e51141d25bf34a0a245004209e45",
             payload=payload
         )
+ 
+
+    def test_identifiers(self):
+        handler = IssueGGOTransactionHandler()
+        
+        self.assertEqual(handler.family_name, 'IssueGGORequest')
+
+        self.assertEqual(len(handler.family_versions), 1)
+        self.assertIn('0.1', handler.family_versions)
+
+        self.assertEqual(len(handler.namespaces), 1)
+        self.assertIn('2b7eba', handler.namespaces)
+
+    def test_internal_error(self):
+        with self.assertRaises(InternalError) as invalid_transaction:
+            IssueGGOTransactionHandler().apply(None, None)
+
+        self.assertEqual(str(invalid_transaction.exception), 'An unknown error has occured.')
+        
 
 
     def test_issue_ggo_no_measurement(self):

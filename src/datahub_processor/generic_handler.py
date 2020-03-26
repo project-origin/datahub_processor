@@ -6,8 +6,20 @@ from sawtooth_sdk.processor.exceptions import InvalidTransaction
 from marshmallow_dataclass import class_schema
 from json import JSONDecodeError
 from .ledger_dto import GGO, Measurement
+from sawtooth_signing import create_context
+from sawtooth_signing.secp256k1 import Secp256k1PublicKey as PublicKey
 
 class GenericHandler(TransactionHandler):
+ 
+    TIMEOUT = 3
+
+    def _validate_signature(self, signed_message, obj, key):
+        context = create_context('secp256k1')
+        message = class_schema(type(obj))().dumps(obj).encode('utf8')
+        pubKey = PublicKey.from_hex(key)
+        
+        return context.verify(signed_message, message, pubKey)
+
 
     def _map_request(self, clazz: type, payload: bytes):
         try:
@@ -25,7 +37,7 @@ class GenericHandler(TransactionHandler):
     def _addresses_not_empty(self, context, addresses):
         return len(context.get_state(addresses)) != 0
 
-    def _get_type(self, clazz: type, context, address):
+    def _try_get_type(self, clazz: type, context, address):
         try:    
             states = context.get_state([address])
             for entry in states:     
@@ -37,7 +49,14 @@ class GenericHandler(TransactionHandler):
         except ValidationError:
             pass
 
-        raise InvalidTransaction(f'Address "{address}" does not contain a valid {clazz.__name__}.')
+        return None
+
+    def _get_type(self, clazz: type, context, address):
+        val = self._try_get_type(clazz, context, address)
+        if val:
+            return val
+        else:
+            raise InvalidTransaction(f'Address "{address}" does not contain a valid {clazz.__name__}.')
 
 
     def _get_measurement(self, context, address) -> Measurement:

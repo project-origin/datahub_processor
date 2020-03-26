@@ -53,3 +53,12 @@ address for certificate is calculated based on grsn and production time.
 sudo apt-get install pkg-config
 sudo apt-get install libsecp256k1-dev
 '''
+
+
+
+
+
+
+
+
+pipenv run pytest --cov-report=term-missing --cov-fail-under=90 --cov=src/datahub_processor test

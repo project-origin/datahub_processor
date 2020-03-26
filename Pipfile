@@ -11,6 +11,8 @@ bip32utils = "*"
 sawtooth-sdk = "*"
 marshmallow-dataclass = "*"
 marshmallow-enum = "*"
+testcontainers = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.7"

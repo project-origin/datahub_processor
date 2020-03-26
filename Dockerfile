@@ -1,8 +1,6 @@
 FROM python:3.7-slim
 
-LABEL Name=measurement_transactions_processor Version=0.0.1
-
-WORKDIR /app
+WORKDIR /root/app
 
 COPY ./requirements.txt requirements.txt
 
@@ -15,6 +13,6 @@ RUN apt-get update &&\
     python3 -m pip install -r requirements.txt &&\
     rm requirements.txt
 
-COPY ./src /app
+COPY ./src /root/app
 
 ENTRYPOINT ["python3", "main.py"]

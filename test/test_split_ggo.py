@@ -1,9 +1,9 @@
 import unittest
 import json
 from datetime import datetime, timezone
-from src.datahub_processor.ledger_dto import GGO, LedgerSplitGGOPart, LedgerSplitGGORequest, GGONext, GGOAction
+from src.datahub_processor.ledger_dto import GGO, SplitGGOPart, SplitGGORequest, GGONext, GGOAction
 
-from sawtooth_sdk.processor.exceptions import InvalidTransaction
+from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 from src.datahub_processor.split_ggo_handler import SplitGGOTransactionHandler
  
 from .mocks import MockContext, FakeTransaction, FakeTransactionHeader
@@ -28,6 +28,27 @@ class TestIssueGGO(unittest.TestCase):
             header_signature="7651c96e081880de546683b7f47ca9124bd398bb7ad5880813a7cb882d2901e405e386730d8ca04aabdfa354b6b66105b1b7e51141d25bf34a0a245004209e45",
             payload=payload
         )
+
+        
+    def test_identifiers(self):
+        handler = SplitGGOTransactionHandler()
+        
+        self.assertEqual(handler.family_name, 'SplitGGORequest')
+
+        self.assertEqual(len(handler.family_versions), 1)
+        self.assertIn('0.1', handler.family_versions)
+
+        self.assertEqual(len(handler.namespaces), 1)
+        self.assertIn('2b7eba', handler.namespaces)
+
+
+    def test_internal_error(self):
+        with self.assertRaises(InternalError) as invalid_transaction:
+            SplitGGOTransactionHandler().apply(None, None)
+
+        self.assertEqual(str(invalid_transaction.exception), 'An unknown error has occured.')
+        
+          
           
     def test_transfer_ggo_success(self):
         
@@ -49,12 +70,12 @@ class TestIssueGGO(unittest.TestCase):
             ggo_src: ggo
         })
 
-        payload = class_schema(LedgerSplitGGORequest)().dumps(LedgerSplitGGORequest(
+        payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                LedgerSplitGGOPart(address="split1_add", amount=10, key="key1"),
-                LedgerSplitGGOPart(address="split2_add", amount=20, key="key2"),
-                LedgerSplitGGOPart(address="split3_add", amount=50, key="key3")
+                SplitGGOPart(address="split1_add", amount=10, key="key1"),
+                SplitGGOPart(address="split2_add", amount=20, key="key2"),
+                SplitGGOPart(address="split3_add", amount=50, key="key3")
             ]
         )).encode('utf8')
 
@@ -139,11 +160,11 @@ class TestIssueGGO(unittest.TestCase):
             ggo_src: ggo
         })
 
-        payload = class_schema(LedgerSplitGGORequest)().dumps(LedgerSplitGGORequest(
+        payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                LedgerSplitGGOPart(address="split1_add", amount=10, key="key1"),
-                LedgerSplitGGOPart(address="split2_add", amount=20, key="key2"),
+                SplitGGOPart(address="split1_add", amount=10, key="key1"),
+                SplitGGOPart(address="split2_add", amount=20, key="key2"),
             ]
         )).encode('utf8')
 
@@ -168,11 +189,11 @@ class TestIssueGGO(unittest.TestCase):
         context = MockContext(states={
         })
         
-        payload = class_schema(LedgerSplitGGORequest)().dumps(LedgerSplitGGORequest(
+        payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                LedgerSplitGGOPart(address="split1_add", amount=10, key="key1"),
-                LedgerSplitGGOPart(address="split2_add", amount=20, key="key2")
+                SplitGGOPart(address="split1_add", amount=10, key="key1"),
+                SplitGGOPart(address="split2_add", amount=20, key="key2")
             ]
         )).encode('utf8')
 
@@ -208,11 +229,11 @@ class TestIssueGGO(unittest.TestCase):
             ggo_src: ggo
         })
 
-        payload = class_schema(LedgerSplitGGORequest)().dumps(LedgerSplitGGORequest(
+        payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                LedgerSplitGGOPart(address="split1_add", amount=10, key="key1"),
-                LedgerSplitGGOPart(address="split2_add", amount=20, key="key2")
+                SplitGGOPart(address="split1_add", amount=10, key="key1"),
+                SplitGGOPart(address="split2_add", amount=20, key="key2")
             ]
         )).encode('utf8')
 
@@ -248,11 +269,11 @@ class TestIssueGGO(unittest.TestCase):
             ggo_src: ggo
         })
 
-        payload = class_schema(LedgerSplitGGORequest)().dumps(LedgerSplitGGORequest(
+        payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                LedgerSplitGGOPart(address="split1_add", amount=10, key="key1"),
-                LedgerSplitGGOPart(address="split2_add", amount=20, key="key2")
+                SplitGGOPart(address="split1_add", amount=10, key="key1"),
+                SplitGGOPart(address="split2_add", amount=20, key="key2")
             ]
         )).encode('utf8')
 
@@ -303,11 +324,11 @@ class TestIssueGGO(unittest.TestCase):
             "split1_add": ggo2
         })
 
-        payload = class_schema(LedgerSplitGGORequest)().dumps(LedgerSplitGGORequest(
+        payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                LedgerSplitGGOPart(address="split1_add", amount=10, key="key1"),
-                LedgerSplitGGOPart(address="split2_add", amount=20, key="key2")
+                SplitGGOPart(address="split1_add", amount=10, key="key1"),
+                SplitGGOPart(address="split2_add", amount=20, key="key2")
             ]
         )).encode('utf8')
 
