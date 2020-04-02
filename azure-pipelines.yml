@@ -1,0 +1,46 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Test
+  displayName: Unit test the code
+  jobs:  
+  - job: Test
+    displayName: Unit tests
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - script: sudo mkdir /etc/sawtooth && sudo chmod 777 /etc/sawtooth &&
+              sudo mkdir /var/lib/sawtooth && sudo chmod 777 /var/lib/sawtooth &&
+              sudo mkdir /var/log/sawtooth && sudo chmod 777 /var/log/sawtooth
+      displayName: Create sawtooth folders
+
+    - script: sudo apt update
+      displayName: Update repo
+
+    - script: sudo apt install -y pkg-config gcc libsecp256k1-dev libzmq3-dev
+      displayName: Install packages
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.7'
+
+    - script: python -m pip install -r requirements.txt
+      displayName: 'Install requirements'
+
+    - script: git submodule update --init --recursive
+      displayName: Git get submodules
+
+    - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=90 --cov=src/datahub_processor
+      displayName: 'Run tests'
