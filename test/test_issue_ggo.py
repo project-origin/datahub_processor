@@ -1,4 +1,5 @@
 import unittest
+import pytest
 import json
 
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
@@ -27,6 +28,7 @@ class TestIssueGGO(unittest.TestCase):
         )
  
 
+    @pytest.mark.unittest
     def test_identifiers(self):
         handler = IssueGGOTransactionHandler()
         
@@ -38,6 +40,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(len(handler.namespaces), 1)
         self.assertIn('2b7eba', handler.namespaces)
 
+    @pytest.mark.unittest
     def test_internal_error(self):
         with self.assertRaises(InternalError) as invalid_transaction:
             IssueGGOTransactionHandler().apply(None, None)
@@ -46,6 +49,7 @@ class TestIssueGGO(unittest.TestCase):
         
 
 
+    @pytest.mark.unittest
     def test_issue_ggo_no_measurement(self):
         
         mea_add = 'mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -73,6 +77,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), 'Address "mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c" does not contain a valid Measurement.')
 
         
+    @pytest.mark.unittest
     def test_issue_ggo_not_a_measurement(self):
         
         mea_add = 'mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -101,6 +106,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), 'Address "mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c" does not contain a valid Measurement.')
 
 
+    @pytest.mark.unittest
     def test_issue_ggo_not_production(self):
         
         mea_add = 'mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -138,6 +144,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), 'Measurement is not of type Production!')
 
           
+    @pytest.mark.unittest
     def test_issue_ggo_success(self):
         
         mea_add = 'mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -186,6 +193,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['key'], '03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e')
 
 
+    @pytest.mark.unittest
     def test_issue_ggo_fail_reissue(self):
         
         mea_add = 'mea8391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'

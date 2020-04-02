@@ -1,4 +1,5 @@
 import unittest
+import pytest
 import json
 from datetime import datetime, timezone
 from bip32utils import BIP32Key
@@ -128,14 +129,8 @@ class TestIssueGGO(unittest.TestCase):
                 )
                 )).encode('utf8')
 
-          
-
-
-
-        
 
     def create_fake_transaction(self, payload, signer_key):
-        
         return FakeTransaction(
             header=FakeTransactionHeader(
                 batcher_public_key="039c6c728796613c8fc4bff1294df728047a6c9fd0a37b9b8d53f0a09fc4906be8",
@@ -151,7 +146,7 @@ class TestIssueGGO(unittest.TestCase):
         )
 
         
-        
+    @pytest.mark.unittest
     def test_identifiers(self):
         handler = RetireGGOTransactionHandler()
         
@@ -164,6 +159,8 @@ class TestIssueGGO(unittest.TestCase):
         self.assertIn('2b7eba', handler.namespaces)
         self.assertIn('1567f1', handler.namespaces)
            
+
+    @pytest.mark.unittest
     def test_internal_error(self):
         with self.assertRaises(InternalError) as invalid_transaction:
             RetireGGOTransactionHandler().apply(None, None)
@@ -171,6 +168,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), 'An unknown error has occured.')
         
           
+    @pytest.mark.unittest
     def test_retire_single_ggo_success(self):
 
         set_add = 'setad_' + self.mea_con_1_add[6:]
@@ -227,6 +225,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['parts'][0]['amount'], 10)
 
 
+    @pytest.mark.unittest
     def test_retire_multiple_ggo_success(self):
 
         set_add = 'setad_' + self.mea_con_1_add[6:]
@@ -308,6 +307,7 @@ class TestIssueGGO(unittest.TestCase):
 
 
         
+    @pytest.mark.unittest
     def test_retire_multiple_ggo_two_transations_success(self):
 
         set_add = 'setad_' + self.mea_con_1_add[6:]
@@ -401,12 +401,8 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['parts'][2]['ggo'], self.ggo_3_add)
         self.assertEqual(obj['parts'][2]['amount'], 15)
 
-
- 
-
-
-        
           
+    @pytest.mark.unittest
     def test_retire_fail_measurment_not_consumption(self):
 
         set_1_add = 'setad_' + self.mea_prod_1_add[6:]
@@ -438,10 +434,9 @@ class TestIssueGGO(unittest.TestCase):
             RetireGGOTransactionHandler().apply(transaction, context)
 
         self.assertEqual(str(invalid_transaction.exception), 'Measurment is not of type consumption')
-
-    
         
           
+    @pytest.mark.unittest
     def test_retire_fail_measurment_not_authorized(self):
 
         set_1_add = 'setad_' + self.mea_con_1_add[6:]
@@ -477,6 +472,7 @@ class TestIssueGGO(unittest.TestCase):
 
 
 
+    @pytest.mark.unittest
     def test_retire_fail_invalid_settlement_add(self):
 
         set_1_add = 'setad_' + self.mea_con_1_add[6:]
@@ -512,6 +508,7 @@ class TestIssueGGO(unittest.TestCase):
 
 
 
+    @pytest.mark.unittest
     def test_retire_fail_ggo_used(self):
 
         set_1_add = 'setad_' + self.mea_con_1_add[6:]
@@ -546,6 +543,7 @@ class TestIssueGGO(unittest.TestCase):
 
 
 
+    @pytest.mark.unittest
     def test_retire_fail_ggo_not_authorized(self):
 
         set_1_add = 'setad_' + self.mea_con_1_add[6:]
@@ -580,6 +578,7 @@ class TestIssueGGO(unittest.TestCase):
 
 
 
+    @pytest.mark.unittest
     def test_retire_fail_too_large(self):
 
         set_add = 'setad_' + self.mea_con_2_add[6:]
@@ -633,10 +632,8 @@ class TestIssueGGO(unittest.TestCase):
 
         self.assertEqual(str(invalid_transaction.exception), 'Invalid to retire more that measurement amount')
 
-
-
-
         
+    @pytest.mark.unittest
     def test_retire_fail_different_measurement_add(self):
 
         set_add = 'setad_' + self.mea_con_1_add[6:]
@@ -697,8 +694,8 @@ class TestIssueGGO(unittest.TestCase):
 
         self.assertEqual(str(invalid_transaction.exception), 'Measurement does not equal settlement measurement')
 
-
                 
+    @pytest.mark.unittest
     def test_retire_fail_multiple_settlement_wrong_key(self):
 
 
@@ -760,8 +757,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), 'Unauthorized retire to settlement')
 
 
-        
-
+    @pytest.mark.unittest
     def test_retire_fail_wrong_settlement_add(self):
 
         set_1_add = 'wrong_settlement_add'

@@ -1,4 +1,5 @@
 import unittest
+import pytest
 import json
 from datetime import datetime, timezone
 
@@ -14,6 +15,7 @@ from marshmallow_dataclass import class_schema
 
 class TestGenericFunctions(unittest.TestCase):
 
+    @pytest.mark.unittest
     def test_get_type(self):
         handler = PublishMeasurementTransactionHandler()
 
@@ -25,9 +27,3 @@ class TestGenericFunctions(unittest.TestCase):
             handler._get_type(GGO, context, 'add_1')
 
         self.assertEqual(str(invalid_transaction.exception), 'Address "add_1" does not contain a valid GGO.')
-
-
-        
-
-
-

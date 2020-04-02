@@ -1,4 +1,5 @@
 import unittest
+import pytest
 import json
 from datetime import datetime, timezone
 
@@ -30,6 +31,8 @@ class TestIssueGGO(unittest.TestCase):
             payload=payload
         )
 
+
+    @pytest.mark.unittest
     def test_identifiers(self):
         handler = TransferGGOTransactionHandler()   
         
@@ -41,14 +44,16 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(len(handler.namespaces), 1)
         self.assertIn('2b7eba', handler.namespaces)
 
+
+    @pytest.mark.unittest
     def test_internal_error(self):
         with self.assertRaises(InternalError) as invalid_transaction:
             TransferGGOTransactionHandler().apply(None, None)
 
         self.assertEqual(str(invalid_transaction.exception), 'An unknown error has occured.')
         
-      
           
+    @pytest.mark.unittest
     def test_transfer_ggo_success(self):
         
         ggo_src = 'ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -116,6 +121,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['key'], 'd3f384923f63906ad06ee903a93d2ee81b14c1b5a20356d6560c99daf6fb19e48e')
 
 
+    @pytest.mark.unittest
     def test_transfer_ggo_no_src_ggo(self):
         
         ggo_src = 'ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -141,6 +147,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), 'Address "ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c" does not contain a valid GGO.')
 
 
+    @pytest.mark.unittest
     def test_transfer_ggo_not_available(self):
         
         ggo_src = 'ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -180,6 +187,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), 'GGO already has been used')
 
 
+    @pytest.mark.unittest
     def test_transfer_ggo_not_authorized(self):
         
         ggo_src = 'ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -220,6 +228,7 @@ class TestIssueGGO(unittest.TestCase):
 
 
 
+    @pytest.mark.unittest
     def test_transfer_ggo_address_not_empty(self):
         
         ggo_src = 'ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -270,7 +279,3 @@ class TestIssueGGO(unittest.TestCase):
             TransferGGOTransactionHandler().apply(transaction, context)
 
         self.assertEqual(str(invalid_transaction.exception), 'Destination address not empty')
-
-
-        
-

@@ -220,6 +220,8 @@ class TestIntegration(unittest.TestCase):
 
         self.assertEqual(status, "COMMITTED")
 
+    @pytest.mark.integrationtest
+    @pytest.mark.trylast
     def test_integration(self):
 
         with DockerCompose(".") as compose:

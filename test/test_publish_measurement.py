@@ -1,6 +1,7 @@
 
 
 import unittest
+import pytest
 import json
 
 from datetime import datetime, timezone
@@ -30,6 +31,7 @@ class TestPublishMeasurement(unittest.TestCase):
         )
 
 
+    @pytest.mark.unittest
     def test_identifiers(self):
         handler = PublishMeasurementTransactionHandler()
         
@@ -42,6 +44,7 @@ class TestPublishMeasurement(unittest.TestCase):
         self.assertIn('146fca', handler.namespaces)
 
 
+    @pytest.mark.unittest
     def test_internal_error(self):
         with self.assertRaises(InternalError) as invalid_transaction:
             PublishMeasurementTransactionHandler().apply(None, None)
@@ -49,7 +52,7 @@ class TestPublishMeasurement(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), 'An unknown error has occured.')
         
 
-
+    @pytest.mark.unittest
     def test_publish_measurement(self):
         
         address = '5a98391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -76,6 +79,7 @@ class TestPublishMeasurement(unittest.TestCase):
         self.assertEqual(measurement.key, '03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e')
 
 
+    @pytest.mark.unittest
     def test_publish_measurement_negative_amount(self):
         
         address = '5a98391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -91,6 +95,7 @@ class TestPublishMeasurement(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), "{'amount': ['Must be greater than or equal to 0.']}")
 
 
+    @pytest.mark.unittest
     def test_publish_measurement_invalid_type(self):
         
         address = '5a98391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -108,6 +113,7 @@ class TestPublishMeasurement(unittest.TestCase):
 
 
 
+    @pytest.mark.unittest
     def test_publish_measurement_invalid_end_before_begin(self):
         
         address = '5a98391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -124,6 +130,7 @@ class TestPublishMeasurement(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), "{'_schema': ['Begin must be before End!']}")
 
         
+    @pytest.mark.unittest
     def test_publish_measurement_invalid_not_hourly(self):
         
         address = '5a98391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -140,6 +147,7 @@ class TestPublishMeasurement(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), "{'_schema': ['Only positive hourly measurements are currently supported!']}")
 
 
+    @pytest.mark.unittest
     def test_publish_measurement_invalid_sector(self):
         
         address = '5a98391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -156,6 +164,7 @@ class TestPublishMeasurement(unittest.TestCase):
         self.assertEqual(str(invalid_transaction.exception), "{'sector': ['Must be one of: DK1, DK2.']}")
 
 
+    @pytest.mark.unittest
     def test_publish_measurement_gibberish(self):
         
         address = '5a98391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
@@ -173,6 +182,7 @@ class TestPublishMeasurement(unittest.TestCase):
 
 
 
+    @pytest.mark.unittest
     def test_address_in_use(self):
 
         address = '5a98391c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
