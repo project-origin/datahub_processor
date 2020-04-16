@@ -9,12 +9,18 @@ resources:
 - repo: self
 
 variables:
+  dockerRegistryServiceConnection: '5e814e0b-3dbf-4b24-9af3-238547ec9c70'
+  imageRepository: 'fyh'
+  containerRegistry: 'originregistry.azurecr.io'
+  dockerfilePath: '**/Dockerfile'
+  tag: '$(Build.BuildId)'
+  
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
 stages:
-- stage: Test
-  displayName: Unit test the code
+- stage: test_and_build
+  displayName: Test and build
   jobs:  
   - job: Test
     displayName: Unit tests
@@ -42,5 +48,23 @@ stages:
     - script: git submodule update --init --recursive
       displayName: Git get submodules
 
-    - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=90 --cov=src/datahub_processor
+    - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=90 --cov=src/origin_handlers
       displayName: 'Run tests'
+
+    - script: pytest -m integrationtest
+      displayName: 'Run tests'
+
+  - job: Docker release
+    displayName: Docker Release
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)

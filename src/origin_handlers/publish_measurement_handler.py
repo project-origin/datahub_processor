@@ -5,7 +5,7 @@ from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 from marshmallow_dataclass import class_schema
 
 from .generic_handler import GenericHandler
-from .ledger_dto import Measurement, PublishMeasurementRequest
+from ..ledger_dto import Measurement, PublishMeasurementRequest
 
 measurement_schema = class_schema(Measurement)
 

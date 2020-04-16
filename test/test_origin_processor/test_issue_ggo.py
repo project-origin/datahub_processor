@@ -3,7 +3,7 @@ import pytest
 import json
 
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
-from src.datahub_processor.issue_ggo_transaction_handler import IssueGGOTransactionHandler
+from src.origin_handlers import IssueGGOTransactionHandler
  
 from .mocks import MockContext, FakeTransaction, FakeTransactionHeader
 

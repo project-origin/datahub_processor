@@ -1,6 +1,8 @@
 import os
 from sawtooth_sdk.processor.core import TransactionProcessor
-from datahub_processor import PublishMeasurementTransactionHandler,  IssueGGOTransactionHandler, TransferGGOTransactionHandler, SplitGGOTransactionHandler, RetireGGOTransactionHandler
+
+from libs.origin_handlers import *
+
 
 def main(url):
     processor = TransactionProcessor(url=url)

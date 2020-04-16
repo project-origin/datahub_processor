@@ -61,4 +61,4 @@ sudo apt-get install libsecp256k1-dev
 
 
 
-pipenv run pytest --cov-report=term-missing --cov-fail-under=90 --cov=src/datahub_processor test
+pipenv run pytest --cov-report=term-missing --cov-fail-under=90 --cov=src/origin_handlers test

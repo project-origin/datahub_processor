@@ -7,11 +7,11 @@ from sawtooth_signing import create_context
 from sawtooth_signing import CryptoFactory, Signer
 from sawtooth_signing.secp256k1 import Secp256k1PrivateKey as PrivateKey
 
-from src.datahub_processor.ledger_dto import GGO, GGONext, GGOAction, Measurement, MeasurementType, RetireGGOPart, SignedRetireGGOPart, RetireGGORequest
+from src.ledger_dto import GGO, GGONext, GGOAction, Measurement, MeasurementType, RetireGGOPart, SignedRetireGGOPart, RetireGGORequest
 
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
-from src.datahub_processor.retire_ggo_handler import RetireGGOTransactionHandler
- 
+from src.origin_handlers import RetireGGOTransactionHandler
+
 from .mocks import MockContext, FakeTransaction, FakeTransactionHeader
 
 from marshmallow_dataclass import class_schema
@@ -188,7 +188,7 @@ class TestIssueGGO(unittest.TestCase):
             key="new_key",
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_1_signer.sign(str(part).encode('utf8'))
             )]
         )).encode('utf8')
 
@@ -256,15 +256,15 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_1,
-                    signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part_1).encode('utf8'))
+                    signature=self.ggo_1_signer.sign(str(part_1).encode('utf8'))
                 ),
                 SignedRetireGGOPart(
                     content=part_2,
-                    signature=self.ggo_2_signer.sign(class_schema(RetireGGOPart)().dumps(part_2).encode('utf8'))
+                    signature=self.ggo_2_signer.sign(str(part_2).encode('utf8'))
                 ),
                 SignedRetireGGOPart(
                     content=part_3,
-                    signature=self.ggo_3_signer.sign(class_schema(RetireGGOPart)().dumps(part_3).encode('utf8'))
+                    signature=self.ggo_3_signer.sign(str(part_3).encode('utf8'))
                 )]
         )).encode('utf8')
 
@@ -338,7 +338,7 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_1,
-                    signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part_1).encode('utf8'))
+                    signature=self.ggo_1_signer.sign(str(part_1).encode('utf8'))
                 )]
         )).encode('utf8')
         
@@ -356,11 +356,11 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_2,
-                    signature=self.ggo_2_signer.sign(class_schema(RetireGGOPart)().dumps(part_2).encode('utf8'))
+                    signature=self.ggo_2_signer.sign(str(part_2).encode('utf8'))
                 ),
                 SignedRetireGGOPart(
                     content=part_3,
-                    signature=self.ggo_3_signer.sign(class_schema(RetireGGOPart)().dumps(part_3).encode('utf8'))
+                    signature=self.ggo_3_signer.sign(str(part_3).encode('utf8'))
                 )]
         )).encode('utf8')
 
@@ -422,7 +422,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_1_signer.sign(str(part).encode('utf8'))
             )]
         )).encode('utf8')
 
@@ -457,7 +457,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_1_signer.sign(str(part).encode('utf8'))
             )]
         )).encode('utf8')
 
@@ -493,7 +493,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_1_signer.sign(str(part).encode('utf8'))
             )]
         )).encode('utf8')
 
@@ -528,7 +528,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_used_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_used_signer.sign(str(part).encode('utf8'))
             )]
         )).encode('utf8')
 
@@ -563,7 +563,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.false_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.false_signer.sign(str(part).encode('utf8'))
             )]
         )).encode('utf8')
 
@@ -609,15 +609,15 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_1,
-                    signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part_1).encode('utf8'))
+                    signature=self.ggo_1_signer.sign(str(part_1).encode('utf8'))
                 ),
                 SignedRetireGGOPart(
                     content=part_2,
-                    signature=self.ggo_2_signer.sign(class_schema(RetireGGOPart)().dumps(part_2).encode('utf8'))
+                    signature=self.ggo_2_signer.sign(str(part_2).encode('utf8'))
                 ),
                 SignedRetireGGOPart(
                     content=part_3,
-                    signature=self.ggo_3_signer.sign(class_schema(RetireGGOPart)().dumps(part_3).encode('utf8'))
+                    signature=self.ggo_3_signer.sign(str(part_3).encode('utf8'))
                 )]
         )).encode('utf8')
 
@@ -658,7 +658,7 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_1,
-                    signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part_1).encode('utf8'))
+                    signature=self.ggo_1_signer.sign(str(part_1).encode('utf8'))
                 )]
         )).encode('utf8')
         
@@ -681,7 +681,7 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_2,
-                    signature=self.ggo_2_signer.sign(class_schema(RetireGGOPart)().dumps(part_2).encode('utf8'))
+                    signature=self.ggo_2_signer.sign(str(part_2).encode('utf8'))
                 )]
         )).encode('utf8')
 
@@ -720,7 +720,7 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_1,
-                    signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part_1).encode('utf8'))
+                    signature=self.ggo_1_signer.sign(str(part_1).encode('utf8'))
                 )]
         )).encode('utf8')
         
@@ -743,7 +743,7 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_2,
-                    signature=self.ggo_2_signer.sign(class_schema(RetireGGOPart)().dumps(part_2).encode('utf8'))
+                    signature=self.ggo_2_signer.sign(str(part_2).encode('utf8'))
                 )]
         )).encode('utf8')
 
@@ -777,7 +777,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_1_signer.sign(str(part).encode('utf8'))
             )]
         )).encode('utf8')
 

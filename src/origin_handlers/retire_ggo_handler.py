@@ -4,8 +4,8 @@ import traceback
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 
 from .generic_handler import GenericHandler
-from .ledger_dto import GGO, GGONext, GGOAction, Settlement, SettlementPart, MeasurementType
-from .ledger_dto import RetireGGORequest, RetireGGOPart, SignedRetireGGOPart
+from ..ledger_dto import GGO, GGONext, GGOAction, Settlement, SettlementPart, MeasurementType
+from ..ledger_dto import RetireGGORequest, RetireGGOPart, SignedRetireGGOPart
 
 
 class RetireGGOTransactionHandler(GenericHandler):

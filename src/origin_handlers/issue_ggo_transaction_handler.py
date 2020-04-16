@@ -4,7 +4,7 @@ import traceback
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 
 from .generic_handler import GenericHandler
-from .ledger_dto import GGO, IssueGGORequest, MeasurementType
+from ..ledger_dto import GGO, IssueGGORequest, MeasurementType
 
 
 class IssueGGOTransactionHandler(GenericHandler):

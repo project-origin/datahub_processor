@@ -9,13 +9,14 @@ from sawtooth_signing import CryptoFactory, Signer
 from sawtooth_signing.secp256k1 import Secp256k1PrivateKey as PrivateKey
 from datetime import datetime, timezone
 from testcontainers.compose import DockerCompose
-from src.datahub_processor.ledger_dto import PublishMeasurementRequest, IssueGGORequest, SplitGGORequest, SplitGGOPart, MeasurementType, TransferGGORequest, RetireGGORequest, RetireGGOPart, SignedRetireGGOPart
+from src.ledger_dto import PublishMeasurementRequest, IssueGGORequest, SplitGGORequest, SplitGGOPart, MeasurementType, TransferGGORequest, RetireGGORequest, RetireGGOPart, SignedRetireGGOPart
 from marshmallow_dataclass import class_schema
 from sawtooth_sdk.protobuf.transaction_pb2 import TransactionHeader, Transaction
 from hashlib import sha512
 from sawtooth_sdk.protobuf.batch_pb2 import BatchHeader
 from sawtooth_sdk.protobuf.batch_pb2 import Batch as SignedBatch
 from sawtooth_sdk.protobuf.batch_pb2 import BatchList
+
 
 
 class TestIntegration(unittest.TestCase):
@@ -181,20 +182,23 @@ class TestIntegration(unittest.TestCase):
         set_add = self.generate_address('1567f1', key_mea)
         ggo_add = self.generate_address('2b7eba', key_ggo)
 
-
+        
         part = RetireGGOPart(
             origin=ggo_add,
             settlement_address=set_add
         )
-        part_bytez = class_schema(RetireGGOPart)().dumps(part).encode('utf8')
-        
+
+        # part_bytez = class_schema(RetireGGOPart)().dumps(part).encode('utf8')
+        part_bytez = str(part).encode('utf8')
+        signed_message = signer_ggo.sign(part_bytez)
+
         request = RetireGGORequest(
             measurement_address=mea_add,
             settlement_address=set_add,
             key=key_set.PublicKey().hex(),
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=signer_ggo.sign(part_bytez)
+                signature=signed_message
             )]
         )
 
@@ -216,7 +220,6 @@ class TestIntegration(unittest.TestCase):
 
             if i > 10:
                 raise Exception("Timeout")
-
 
         self.assertEqual(status, "COMMITTED")
 
