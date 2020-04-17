@@ -20,8 +20,8 @@ class RetireGGOTransactionHandler(GenericHandler):
 
     @property
     def namespaces(self):
-        ggo_namespace = hashlib.sha512('ggo'.encode('utf-8')).hexdigest()[0:6]
-        settlement_namespace = hashlib.sha512('settlement'.encode('utf-8')).hexdigest()[0:6]
+        ggo_namespace = hashlib.sha512('GGO'.encode('utf-8')).hexdigest()[0:6]
+        settlement_namespace = hashlib.sha512('SETTLEMENT'.encode('utf-8')).hexdigest()[0:6]
         return [ggo_namespace, settlement_namespace]
 
 

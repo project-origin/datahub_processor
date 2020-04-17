@@ -21,7 +21,7 @@ class PublishMeasurementTransactionHandler(GenericHandler):
 
     @property
     def namespaces(self):
-        measurement_namespace = hashlib.sha512('measurement'.encode('utf-8')).hexdigest()[0:6]
+        measurement_namespace = hashlib.sha512('MEASUREMENT'.encode('utf-8')).hexdigest()[0:6]
         return [measurement_namespace]
 
 
