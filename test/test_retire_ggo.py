@@ -156,8 +156,8 @@ class TestIssueGGO(unittest.TestCase):
         self.assertIn('0.1', handler.family_versions)
 
         self.assertEqual(len(handler.namespaces), 2)
-        self.assertIn('2b7eba', handler.namespaces)
-        self.assertIn('1567f1', handler.namespaces)
+        self.assertIn('849c0b', handler.namespaces)
+        self.assertIn('ba4817', handler.namespaces)
            
 
     @pytest.mark.unittest

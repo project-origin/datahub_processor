@@ -78,7 +78,7 @@ class TestIntegration(unittest.TestCase):
         key = self.master_key.ChildKey(1)
         signer = self.crypto.new_signer(PrivateKey.from_bytes(key.PrivateKey()))   
 
-        add = self.generate_address('146fca', key)
+        add = self.generate_address('5a9839', key)
 
         request = PublishMeasurementRequest(
             begin=datetime(2020,1,1,12, tzinfo=timezone.utc),
@@ -96,7 +96,7 @@ class TestIntegration(unittest.TestCase):
         key = self.master_key.ChildKey(10)
         signer = self.crypto.new_signer(PrivateKey.from_bytes(key.PrivateKey()))   
 
-        add = self.generate_address('146fca', key)
+        add = self.generate_address('5a9839', key)
 
         request = PublishMeasurementRequest(
             begin=datetime(2020,1,1,12, tzinfo=timezone.utc),
@@ -114,8 +114,8 @@ class TestIntegration(unittest.TestCase):
         key = self.master_key.ChildKey(1)
         signer = self.crypto.new_signer(PrivateKey.from_bytes(key.PrivateKey()))   
 
-        mea_add = self.generate_address('146fca', key)
-        ggo_add = self.generate_address('2b7eba', key)
+        mea_add = self.generate_address('5a9839', key)
+        ggo_add = self.generate_address('849c0b', key)
 
         request = IssueGGORequest(
             origin=mea_add,
@@ -135,9 +135,9 @@ class TestIntegration(unittest.TestCase):
 
         signer = self.crypto.new_signer(PrivateKey.from_bytes(key1.PrivateKey()))   
 
-        ggo_add_1 = self.generate_address('2b7eba', key1)
-        ggo_add_2 = self.generate_address('2b7eba', key2)
-        ggo_add_3 = self.generate_address('2b7eba', key3)
+        ggo_add_1 = self.generate_address('849c0b', key1)
+        ggo_add_2 = self.generate_address('849c0b', key2)
+        ggo_add_3 = self.generate_address('849c0b', key3)
 
         request = SplitGGORequest(
             origin=ggo_add_1,
@@ -156,8 +156,8 @@ class TestIntegration(unittest.TestCase):
 
         signer = self.crypto.new_signer(PrivateKey.from_bytes(key2.PrivateKey()))   
 
-        ggo_add_2 = self.generate_address('2b7eba', key2)
-        ggo_add_4 = self.generate_address('2b7eba', key4)
+        ggo_add_2 = self.generate_address('849c0b', key2)
+        ggo_add_4 = self.generate_address('849c0b', key4)
 
         request = TransferGGORequest(
             origin=ggo_add_2,
@@ -177,9 +177,9 @@ class TestIntegration(unittest.TestCase):
         signer_mea = self.crypto.new_signer(PrivateKey.from_bytes(key_mea.PrivateKey()))   
         signer_ggo = self.crypto.new_signer(PrivateKey.from_bytes(key_ggo.PrivateKey()))   
 
-        mea_add = self.generate_address('146fca', key_mea)
-        set_add = self.generate_address('1567f1', key_mea)
-        ggo_add = self.generate_address('2b7eba', key_ggo)
+        mea_add = self.generate_address('5a9839', key_mea)
+        set_add = self.generate_address('ba4817', key_mea)
+        ggo_add = self.generate_address('849c0b', key_ggo)
 
 
         part = RetireGGOPart(

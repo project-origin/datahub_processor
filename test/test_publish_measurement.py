@@ -41,7 +41,7 @@ class TestPublishMeasurement(unittest.TestCase):
         self.assertIn('0.1', handler.family_versions)
 
         self.assertEqual(len(handler.namespaces), 1)
-        self.assertIn('146fca', handler.namespaces)
+        self.assertIn('5a9839', handler.namespaces)
 
 
     @pytest.mark.unittest
