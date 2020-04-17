@@ -3,10 +3,10 @@ import pytest
 import json
 from datetime import datetime, timezone
 
-from src.ledger_dto import GGO, TransferGGORequest, GGONext, GGOAction
+from src.datahub_processor.ledger_dto import GGO, TransferGGORequest, GGONext, GGOAction
 
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
-from src.origin_handlers import TransferGGOTransactionHandler
+from src.datahub_processor.transfer_ggo_handler import TransferGGOTransactionHandler
  
 from .mocks import MockContext, FakeTransaction, FakeTransactionHeader
 

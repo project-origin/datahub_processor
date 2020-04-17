@@ -5,7 +5,7 @@ from marshmallow import ValidationError
 from sawtooth_sdk.processor.exceptions import InvalidTransaction
 from marshmallow_dataclass import class_schema
 from json import JSONDecodeError
-from ..ledger_dto import GGO, Measurement
+from .ledger_dto import GGO, Measurement
 from sawtooth_signing import create_context
 from sawtooth_signing.secp256k1 import Secp256k1PublicKey as PublicKey
 
@@ -15,7 +15,7 @@ class GenericHandler(TransactionHandler):
 
     def _validate_signature(self, signed_message, obj, key):
         context = create_context('secp256k1')
-        message = str(obj).encode('utf8')
+        message = class_schema(type(obj))().dumps(obj).encode('utf8')
         pubKey = PublicKey.from_hex(key)
         
         return context.verify(signed_message, message, pubKey)

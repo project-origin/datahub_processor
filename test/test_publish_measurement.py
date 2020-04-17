@@ -6,8 +6,8 @@ import json
 
 from datetime import datetime, timezone
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
-from src.origin_handlers import PublishMeasurementTransactionHandler
-from src.ledger_dto import MeasurementType, Measurement
+from src.datahub_processor.publish_measurement_handler import PublishMeasurementTransactionHandler, measurement_schema, Measurement
+from src.datahub_processor.ledger_dto import MeasurementType
  
 from .mocks import MockContext, FakeTransaction, FakeTransactionHeader
 
@@ -70,7 +70,7 @@ class TestPublishMeasurement(unittest.TestCase):
         obj = json.loads(context.states[address].decode('utf8'))
         self.assertEqual(len(obj), 6)
 
-        measurement: Measurement = Measurement.get_schema().loads(context.states[address].decode('utf8'))
+        measurement: Measurement = measurement_schema().loads(context.states[address].decode('utf8'))
         self.assertEqual(measurement.amount, 5123)
         self.assertEqual(measurement.begin, datetime(2020,1,1,12, tzinfo=timezone.utc))
         self.assertEqual(measurement.end, datetime(2020,1,1,13, tzinfo=timezone.utc))

@@ -2,8 +2,7 @@ version: '3'
 services:
 
   datahub-tp:
-    build:
-      context: .
+    build: .
     depends_on:
       - validator
     environment:

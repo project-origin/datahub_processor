@@ -1,0 +1,3 @@
+[submodule "src/datahub_processor/ledger_dto"]
+	path = src/datahub_processor/ledger_dto
+	url = https://github.com/project-origin/ledger-dto-python

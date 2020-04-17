@@ -2,10 +2,10 @@ import unittest
 import pytest
 import json
 from datetime import datetime, timezone
-from src.ledger_dto import GGO, SplitGGOPart, SplitGGORequest, GGONext, GGOAction
+from src.datahub_processor.ledger_dto import GGO, SplitGGOPart, SplitGGORequest, GGONext, GGOAction
 
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
-from src.origin_handlers import SplitGGOTransactionHandler
+from src.datahub_processor.split_ggo_handler import SplitGGOTransactionHandler
  
 from .mocks import MockContext, FakeTransaction, FakeTransactionHeader
 
