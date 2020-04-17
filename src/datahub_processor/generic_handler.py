@@ -15,7 +15,7 @@ class GenericHandler(TransactionHandler):
 
     def _validate_signature(self, signed_message, obj, key):
         context = create_context('secp256k1')
-        message = class_schema(type(obj))().dumps(obj).encode('utf8')
+        message = obj.get_signature_bytes()
         pubKey = PublicKey.from_hex(key)
         
         return context.verify(signed_message, message, pubKey)

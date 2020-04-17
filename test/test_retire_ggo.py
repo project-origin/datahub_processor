@@ -188,7 +188,7 @@ class TestIssueGGO(unittest.TestCase):
             key="new_key",
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_1_signer.sign(part.get_signature_bytes())
             )]
         )).encode('utf8')
 
@@ -256,15 +256,15 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_1,
-                    signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part_1).encode('utf8'))
+                    signature=self.ggo_1_signer.sign(part_1.get_signature_bytes())
                 ),
                 SignedRetireGGOPart(
                     content=part_2,
-                    signature=self.ggo_2_signer.sign(class_schema(RetireGGOPart)().dumps(part_2).encode('utf8'))
+                    signature=self.ggo_2_signer.sign(part_2.get_signature_bytes())
                 ),
                 SignedRetireGGOPart(
                     content=part_3,
-                    signature=self.ggo_3_signer.sign(class_schema(RetireGGOPart)().dumps(part_3).encode('utf8'))
+                    signature=self.ggo_3_signer.sign(part_3.get_signature_bytes())
                 )]
         )).encode('utf8')
 
@@ -338,7 +338,7 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_1,
-                    signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part_1).encode('utf8'))
+                    signature=self.ggo_1_signer.sign(part_1.get_signature_bytes())
                 )]
         )).encode('utf8')
         
@@ -356,11 +356,11 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_2,
-                    signature=self.ggo_2_signer.sign(class_schema(RetireGGOPart)().dumps(part_2).encode('utf8'))
+                    signature=self.ggo_2_signer.sign(part_2.get_signature_bytes())
                 ),
                 SignedRetireGGOPart(
                     content=part_3,
-                    signature=self.ggo_3_signer.sign(class_schema(RetireGGOPart)().dumps(part_3).encode('utf8'))
+                    signature=self.ggo_3_signer.sign(part_3.get_signature_bytes())
                 )]
         )).encode('utf8')
 
@@ -422,7 +422,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_1_signer.sign(part.get_signature_bytes())
             )]
         )).encode('utf8')
 
@@ -457,7 +457,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_1_signer.sign(part.get_signature_bytes())
             )]
         )).encode('utf8')
 
@@ -493,7 +493,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_1_signer.sign(part.get_signature_bytes())
             )]
         )).encode('utf8')
 
@@ -528,7 +528,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_used_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_used_signer.sign(part.get_signature_bytes())
             )]
         )).encode('utf8')
 
@@ -563,7 +563,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.false_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.false_signer.sign(part.get_signature_bytes())
             )]
         )).encode('utf8')
 
@@ -609,15 +609,15 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_1,
-                    signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part_1).encode('utf8'))
+                    signature=self.ggo_1_signer.sign(part_1.get_signature_bytes())
                 ),
                 SignedRetireGGOPart(
                     content=part_2,
-                    signature=self.ggo_2_signer.sign(class_schema(RetireGGOPart)().dumps(part_2).encode('utf8'))
+                    signature=self.ggo_2_signer.sign(part_2.get_signature_bytes())
                 ),
                 SignedRetireGGOPart(
                     content=part_3,
-                    signature=self.ggo_3_signer.sign(class_schema(RetireGGOPart)().dumps(part_3).encode('utf8'))
+                    signature=self.ggo_3_signer.sign(part_3.get_signature_bytes())
                 )]
         )).encode('utf8')
 
@@ -658,7 +658,7 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_1,
-                    signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part_1).encode('utf8'))
+                    signature=self.ggo_1_signer.sign(part_1.get_signature_bytes())
                 )]
         )).encode('utf8')
         
@@ -681,7 +681,7 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_2,
-                    signature=self.ggo_2_signer.sign(class_schema(RetireGGOPart)().dumps(part_2).encode('utf8'))
+                    signature=self.ggo_2_signer.sign(part_2.get_signature_bytes())
                 )]
         )).encode('utf8')
 
@@ -720,7 +720,7 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_1,
-                    signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part_1).encode('utf8'))
+                    signature=self.ggo_1_signer.sign(part_1.get_signature_bytes())
                 )]
         )).encode('utf8')
         
@@ -743,7 +743,7 @@ class TestIssueGGO(unittest.TestCase):
             parts=[
                 SignedRetireGGOPart(
                     content=part_2,
-                    signature=self.ggo_2_signer.sign(class_schema(RetireGGOPart)().dumps(part_2).encode('utf8'))
+                    signature=self.ggo_2_signer.sign(part_2.get_signature_bytes())
                 )]
         )).encode('utf8')
 
@@ -777,7 +777,7 @@ class TestIssueGGO(unittest.TestCase):
             key='new_key',
             parts=[SignedRetireGGOPart(
                 content=part,
-                signature=self.ggo_1_signer.sign(class_schema(RetireGGOPart)().dumps(part).encode('utf8'))
+                signature=self.ggo_1_signer.sign(part.get_signature_bytes())
             )]
         )).encode('utf8')
 

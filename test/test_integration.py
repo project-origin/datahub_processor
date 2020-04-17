@@ -186,7 +186,7 @@ class TestIntegration(unittest.TestCase):
             origin=ggo_add,
             settlement_address=set_add
         )
-        part_bytez = class_schema(RetireGGOPart)().dumps(part).encode('utf8')
+        part_bytez = part.get_signature_bytes()
         
         request = RetireGGORequest(
             measurement_address=mea_add,
