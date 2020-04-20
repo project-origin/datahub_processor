@@ -4,8 +4,8 @@ import traceback
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 
 from .generic_handler import GenericHandler
-from .ledger_dto import GGO, GGONext, GGOAction, Settlement, SettlementPart, MeasurementType
-from .ledger_dto import RetireGGORequest, RetireGGOPart, SignedRetireGGOPart
+from .ledger_dto import GGO, GGONext, GGOAction, Settlement, SettlementPart, MeasurementType, generate_address, AddressPrefix
+from .ledger_dto import RetireGGORequest
 
 
 class RetireGGOTransactionHandler(GenericHandler):
@@ -21,8 +21,7 @@ class RetireGGOTransactionHandler(GenericHandler):
     @property
     def namespaces(self):
         ggo_namespace = hashlib.sha512('GGO'.encode('utf-8')).hexdigest()[0:6]
-        settlement_namespace = hashlib.sha512('SETTLEMENT'.encode('utf-8')).hexdigest()[0:6]
-        return [ggo_namespace, settlement_namespace]
+        return [ggo_namespace]
 
 
     def apply(self, transaction, context):
@@ -30,70 +29,29 @@ class RetireGGOTransactionHandler(GenericHandler):
         try:
             request: RetireGGORequest = self._map_request(RetireGGORequest, transaction.payload)
 
-            measurement = self._get_measurement(context, request.measurement_address)
-            settlement: Settlement = self._try_get_type(Settlement, context, request.settlement_address)
+            current_ggo = self._get_ggo(context, request.origin)
 
-            if settlement != None:
-                if settlement.measurement != request.measurement_address:
-                    raise InvalidTransaction('Measurement does not equal settlement measurement')
+            if current_ggo.next != None:
+                raise InvalidTransaction('GGO already has been used')
 
-                if settlement.key != transaction.header.signer_public_key:
-                    raise InvalidTransaction('Unauthorized retire to settlement')
+            public_key_bytes = bytearray.fromhex(transaction.header.signer_public_key)
+            generated_address = generate_address(AddressPrefix.GGO, public_key_bytes)
+            if generated_address != request.origin:
+                 raise InvalidTransaction('Invalid key for GGO')
 
-            else:
-                if request.measurement_address[6:] != request.settlement_address[6:]:
-                    raise InvalidTransaction('Not correct settlement address for measurement')
-                
-                if measurement.type != MeasurementType.CONSUMPTION:
-                    raise InvalidTransaction('Measurment is not of type consumption')
+            current_ggo.next = GGONext(
+                action=GGOAction.RETIRE,
+                addresses=[request.settlement_address]
+            )
 
-                if measurement.key != transaction.header.signer_public_key:
-                    raise InvalidTransaction('Unauthorized retire to measurement')
-
-                settlement = Settlement(
-                    measurement=request.measurement_address,
-                    key=request.key,
-                    parts=[]
-                )
-
-            settlement.key = request.key
-            state_update = {}
-            
-            for part in request.parts:
-                if part.content.settlement_address != request.settlement_address:
-                    raise InvalidTransaction('Invalid destination, not the same as measurement')
-
-                ggo = self._get_ggo(context, part.content.origin)
-
-                if ggo.next != None:
-                    raise InvalidTransaction('GGO already has been used')
-
-                if not self._validate_signature(part.signature, part.content, ggo.key):
-                    raise InvalidTransaction('Unauthorized retire on GGO')
-
-                # TODO implement time and sector rules
-
-                ggo.next = GGONext(
-                    action=GGOAction.RETIRE,
-                    addresses=[request.settlement_address]
-                )
-
-                settlement.parts.append(SettlementPart(
-                        ggo=part.content.origin,
-                        amount=ggo.amount
-                    ))
-
-                state_update[part.content.origin] = GGO.get_schema().dumps(ggo).encode('utf8')
-                
-            state_update[request.settlement_address] = Settlement.get_schema().dumps(settlement).encode('utf8')
-
-            if sum([p.amount for p in settlement.parts]) > measurement.amount:
-                raise InvalidTransaction('Invalid to retire more that measurement amount')
+            payload_current = GGO.get_schema().dumps(current_ggo).encode('utf8')
 
             context.set_state(
-                state_update, 
+                {
+                    request.origin: payload_current
+                }, 
                 self.TIMEOUT)
-            
+
         except InvalidTransaction as ex:
             track = traceback.format_exc()
             print("InvalidException", ex)

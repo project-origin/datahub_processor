@@ -9,7 +9,7 @@ from sawtooth_signing import CryptoFactory, Signer
 from sawtooth_signing.secp256k1 import Secp256k1PrivateKey as PrivateKey
 from datetime import datetime, timezone
 from testcontainers.compose import DockerCompose
-from src.datahub_processor.ledger_dto import PublishMeasurementRequest, IssueGGORequest, SplitGGORequest, SplitGGOPart, MeasurementType, TransferGGORequest, RetireGGORequest, RetireGGOPart, SignedRetireGGOPart
+from src.datahub_processor.ledger_dto import PublishMeasurementRequest, IssueGGORequest, SplitGGORequest, SplitGGOPart, MeasurementType, TransferGGORequest, RetireGGORequest, SettlementRequest, generate_address, AddressPrefix
 from marshmallow_dataclass import class_schema
 from sawtooth_sdk.protobuf.transaction_pb2 import TransactionHeader, Transaction
 from hashlib import sha512
@@ -24,11 +24,6 @@ class TestIntegration(unittest.TestCase):
         self.master_key = BIP32Key.fromEntropy("bfdgafgaertaehtaha43514r<aefag".encode())
         context = create_context('secp256k1')
         self.crypto = CryptoFactory(context)
-
-    def generate_address(self, prefix, extended_key: BIP32Key) -> str:
-        key_add = extended_key.Address()
-        prefix_add = sha512(prefix.encode('utf-8')).hexdigest()[:6]
-        return prefix_add + sha512(key_add.encode('utf-8')).hexdigest()[:64]
 
     def send_request(self, url, request, add, signer):
 
@@ -78,15 +73,14 @@ class TestIntegration(unittest.TestCase):
         key = self.master_key.ChildKey(1)
         signer = self.crypto.new_signer(PrivateKey.from_bytes(key.PrivateKey()))   
 
-        add = self.generate_address('5a9839', key)
+        add = generate_address(AddressPrefix.MEASUREMENT, key.PublicKey())
 
         request = PublishMeasurementRequest(
             begin=datetime(2020,1,1,12, tzinfo=timezone.utc),
             end=datetime(2020,1,1,13, tzinfo=timezone.utc),
             sector='DK1',
             type=MeasurementType.PRODUCTION,
-            amount=1024,
-            key=key.PublicKey().hex()
+            amount=1024
         )
 
         return self.send_request(url, request, [add], signer)
@@ -96,15 +90,14 @@ class TestIntegration(unittest.TestCase):
         key = self.master_key.ChildKey(10)
         signer = self.crypto.new_signer(PrivateKey.from_bytes(key.PrivateKey()))   
 
-        add = self.generate_address('5a9839', key)
+        add = generate_address(AddressPrefix.MEASUREMENT, key.PublicKey())
 
         request = PublishMeasurementRequest(
             begin=datetime(2020,1,1,12, tzinfo=timezone.utc),
             end=datetime(2020,1,1,13, tzinfo=timezone.utc),
             sector='DK1',
             type=MeasurementType.CONSUMPTION,
-            amount=500,
-            key=key.PublicKey().hex()
+            amount=500
         )
 
         return self.send_request(url, request, [add], signer)
@@ -114,15 +107,14 @@ class TestIntegration(unittest.TestCase):
         key = self.master_key.ChildKey(1)
         signer = self.crypto.new_signer(PrivateKey.from_bytes(key.PrivateKey()))   
 
-        mea_add = self.generate_address('5a9839', key)
-        ggo_add = self.generate_address('849c0b', key)
+        mea_add = generate_address(AddressPrefix.MEASUREMENT, key.PublicKey())
+        ggo_add = generate_address(AddressPrefix.GGO, key.PublicKey())
 
         request = IssueGGORequest(
             origin=mea_add,
             destination=ggo_add,
             tech_type='T12441',
-            fuel_type='F12412',
-            key=key.PublicKey().hex()
+            fuel_type='F12412'
         )
 
         return self.send_request(url, request, [mea_add, ggo_add], signer)
@@ -135,15 +127,15 @@ class TestIntegration(unittest.TestCase):
 
         signer = self.crypto.new_signer(PrivateKey.from_bytes(key1.PrivateKey()))   
 
-        ggo_add_1 = self.generate_address('849c0b', key1)
-        ggo_add_2 = self.generate_address('849c0b', key2)
-        ggo_add_3 = self.generate_address('849c0b', key3)
+        ggo_add_1 = generate_address(AddressPrefix.GGO, key1.PublicKey())
+        ggo_add_2 = generate_address(AddressPrefix.GGO, key2.PublicKey())
+        ggo_add_3 = generate_address(AddressPrefix.GGO, key3.PublicKey())
 
         request = SplitGGORequest(
             origin=ggo_add_1,
             parts=[
-                SplitGGOPart(ggo_add_2, 500, key2.PublicKey().hex()),
-                SplitGGOPart(ggo_add_3, 524, key3.PublicKey().hex())
+                SplitGGOPart(ggo_add_2, 500),
+                SplitGGOPart(ggo_add_3, 524)
             ]
         )
 
@@ -156,13 +148,12 @@ class TestIntegration(unittest.TestCase):
 
         signer = self.crypto.new_signer(PrivateKey.from_bytes(key2.PrivateKey()))   
 
-        ggo_add_2 = self.generate_address('849c0b', key2)
-        ggo_add_4 = self.generate_address('849c0b', key4)
+        ggo_add_2 = generate_address(AddressPrefix.GGO, key2.PublicKey())
+        ggo_add_4 = generate_address(AddressPrefix.GGO, key4.PublicKey())
 
         request = TransferGGORequest(
             origin=ggo_add_2,
-            destination=ggo_add_4,
-            key=key4.PublicKey().hex()
+            destination=ggo_add_4
         )
 
         return self.send_request(url, request, [ggo_add_2, ggo_add_4], signer)
@@ -172,30 +163,26 @@ class TestIntegration(unittest.TestCase):
     def retire_ggo(self, url):
         key_ggo = self.master_key.ChildKey(4)
         key_mea = self.master_key.ChildKey(10)
-        key_set = self.master_key.ChildKey(11)
 
         signer_mea = self.crypto.new_signer(PrivateKey.from_bytes(key_mea.PrivateKey()))   
         signer_ggo = self.crypto.new_signer(PrivateKey.from_bytes(key_ggo.PrivateKey()))   
 
-        mea_add = self.generate_address('5a9839', key_mea)
-        set_add = self.generate_address('ba4817', key_mea)
-        ggo_add = self.generate_address('849c0b', key_ggo)
-
-
-        part = RetireGGOPart(
-            origin=ggo_add,
-            settlement_address=set_add
-        )
-        part_bytez = part.get_signature_bytes()
+        mea_add = generate_address(AddressPrefix.MEASUREMENT, key_mea.PublicKey())
+        set_add = generate_address(AddressPrefix.SETTLEMENT, key_mea.PublicKey())
+        ggo_add = generate_address(AddressPrefix.GGO, key_ggo.PublicKey())
         
-        request = RetireGGORequest(
-            measurement_address=mea_add,
+        retire_request = RetireGGORequest(
+            origin=ggo_add,
+            settlement_address=set_add)
+        
+        retire_response = self.send_request(url, retire_request, [mea_add, set_add, ggo_add], signer_ggo)
+
+        self.wait_for_commit(retire_response.json()['link'])
+
+        request = SettlementRequest(
             settlement_address=set_add,
-            key=key_set.PublicKey().hex(),
-            parts=[SignedRetireGGOPart(
-                content=part,
-                signature=signer_ggo.sign(part_bytez)
-            )]
+            measurement_address=mea_add,
+            ggo_addresses=[ggo_add]
         )
 
         return self.send_request(url, request, [mea_add, set_add, ggo_add], signer_mea)

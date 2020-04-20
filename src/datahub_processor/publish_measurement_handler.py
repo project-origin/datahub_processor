@@ -41,8 +41,7 @@ class PublishMeasurementTransactionHandler(GenericHandler):
                     type=request.type,
                     begin=request.begin,
                     end=request.end,
-                    sector=request.sector,
-                    key=request.key
+                    sector=request.sector
                 )
 
             payload = measurement_schema(exclude=["address"]).dumps(measurement).encode('utf8')

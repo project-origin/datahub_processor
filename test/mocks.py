@@ -40,12 +40,12 @@ class FakeTransactionHeader:
     family_version: str = field()
     inputs: List[str] = field()
     outputs: List[str] = field()
-    payload_sha512: str = field()
+    #payload_sha512: str = field()
     signer_public_key: str = field()
     
 
 @dataclass
 class FakeTransaction:
     header: FakeTransactionHeader = field()
-    header_signature: str = field()
+    #header_signature: str = field()
     payload: bytes = field()

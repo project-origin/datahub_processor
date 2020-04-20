@@ -21,9 +21,7 @@ class TestIssueGGO(unittest.TestCase):
                 family_version="0.1",
                 inputs=inputs,
                 outputs=outputs,
-                payload_sha512="d70bfa9020d4f03a7ca4e706b81d3d8b3cf93fe9942b83f1e1661517d8da8991708a87ca7a50fd536fdd218e7ebe5385454286693897cd96686dca6f5649256e",
                 signer_public_key="039c6c728796613c8fc4bff1294df728047a6c9fd0a37b9b8d53f0a09fc4906be8"),
-            header_signature="7651c96e081880de546683b7f47ca9124bd398bb7ad5880813a7cb882d2901e405e386730d8ca04aabdfa354b6b66105b1b7e51141d25bf34a0a245004209e45",
             payload=payload
         )
  
@@ -62,8 +60,7 @@ class TestIssueGGO(unittest.TestCase):
             "origin":mea_add,
             "destination": ggo_add,
             "tech_type":"T12412",
-            "fuel_type":"F010101",
-            "key":"aregaerg"
+            "fuel_type":"F010101"
         }).encode('utf8')
 
         transaction = self.create_fake_transaction(
@@ -91,8 +88,7 @@ class TestIssueGGO(unittest.TestCase):
             "origin": mea_add,
             "destination": ggo_add,
             "tech_type":"T12412",
-            "fuel_type":"F010101",
-            "key":"aregaerg"
+            "fuel_type":"F010101"
         }).encode('utf8')
 
         transaction = self.create_fake_transaction(
@@ -117,8 +113,7 @@ class TestIssueGGO(unittest.TestCase):
                 'type': 'CONSUMPTION',
                 'begin': "2020-01-01T12:00:00+00:00",
                 'end': "2020-01-01T13:00:00+00:00",
-                'sector': 'DK1',
-                'key': '03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e'
+                'sector': 'DK1'
             }).encode('utf8')
 
         context = MockContext(states={
@@ -129,8 +124,7 @@ class TestIssueGGO(unittest.TestCase):
             "origin": mea_add,
             "destination": ggo_add,
             "tech_type":"T12412",
-            "fuel_type":"F010101",
-            "key":"03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e"
+            "fuel_type":"F010101"
         }).encode('utf8')
 
         transaction = self.create_fake_transaction(
@@ -155,8 +149,7 @@ class TestIssueGGO(unittest.TestCase):
                 'type': 'PRODUCTION',
                 'begin': "2020-01-01T12:00:00+00:00",
                 'end': "2020-01-01T13:00:00+00:00",
-                'sector': 'DK1',
-                'key': '03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e'
+                'sector': 'DK1'
             }).encode('utf8')
 
         context = MockContext(states={
@@ -167,8 +160,7 @@ class TestIssueGGO(unittest.TestCase):
             "origin": mea_add,
             "destination": ggo_add,
             "tech_type":"T12412",
-            "fuel_type":"F010101",
-            "key":"03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e"
+            "fuel_type":"F010101"
         }).encode('utf8')
 
         transaction = self.create_fake_transaction(
@@ -180,7 +172,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertIn(ggo_add, context.states)
 
         obj = json.loads(context.states[ggo_add].decode('utf8'))
-        self.assertEqual(len(obj), 9)
+        self.assertEqual(len(obj), 8)
 
         self.assertEqual(obj['origin'], mea_add)
         self.assertEqual(obj['amount'], 123)
@@ -190,7 +182,6 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['tech_type'], 'T12412')
         self.assertEqual(obj['fuel_type'], 'F010101')
         self.assertEqual(obj['next'], None)
-        self.assertEqual(obj['key'], '03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e')
 
 
     @pytest.mark.unittest
@@ -204,8 +195,7 @@ class TestIssueGGO(unittest.TestCase):
                 'type': 'PRODUCTION',
                 'begin': "2020-01-01T12:00:00+00:00",
                 'end': "2020-01-01T13:00:00+00:00",
-                'sector': 'DK1',
-                'key': '03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e'
+                'sector': 'DK1'
             }).encode('utf8')
 
         context = MockContext(states={
@@ -216,8 +206,7 @@ class TestIssueGGO(unittest.TestCase):
             "origin": mea_add,
             "destination": ggo_add,
             "tech_type":"T12412",
-            "fuel_type":"F010101",
-            "key":"03a93d2ee81b16ee95a20356d6560c99da4c1bd3f384923f63906ad0f6fb19e48e"
+            "fuel_type":"F010101"
         }).encode('utf8')
 
         transaction = self.create_fake_transaction(
