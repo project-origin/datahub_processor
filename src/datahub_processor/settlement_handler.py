@@ -79,10 +79,15 @@ class SettlementHandler(GenericHandler):
                 if ggo.next.addresses[0] != request.settlement_address:
                     raise InvalidTransaction('Invalid retired GGO in settlement')
 
+                if ggo.sector != measurement.sector:
+                    raise InvalidTransaction('GGO not produced in same sector as measurement')
+
+                if ggo.begin != measurement.begin:
+                    raise InvalidTransaction('GGO not produced at the same time as measurement')
+
                 for part in settlement.parts:
                     if part.ggo == ggo_address:
                         raise InvalidTransaction('GGO already part of settlement')
-
 
                 settlement.parts.append(SettlementPart(
                         ggo=ggo_address,

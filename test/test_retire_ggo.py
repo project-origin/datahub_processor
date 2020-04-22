@@ -105,6 +105,35 @@ class TestIssueGGO(unittest.TestCase):
                 next=None
                 )).encode('utf8')
 
+        self.ggo_DK2_key = master_key.ChildKey(2).ChildKey(3)
+        self.ggo_DK2_signer =  CryptoFactory(context).new_signer(PrivateKey.from_bytes(self.ggo_DK2_key.PrivateKey()))   
+        self.ggo_DK2_add = generate_address(AddressPrefix.GGO, self.ggo_DK2_key.PublicKey())
+        self.ggo_DK2 = GGO.get_schema().dumps(GGO(
+                origin=self.mea_prod_3_add,
+                amount=15,
+                begin=datetime(2020,1,1,12, tzinfo=timezone.utc),
+                end=datetime(2020,1,1,13, tzinfo=timezone.utc),
+                tech_type='T12412',
+                fuel_type='F010101',
+                sector='DK2',
+                next=None
+                )).encode('utf8')
+
+        
+        self.ggo_other_time_key = master_key.ChildKey(2).ChildKey(3)
+        self.ggo_other_time_signer =  CryptoFactory(context).new_signer(PrivateKey.from_bytes(self.ggo_other_time_key.PrivateKey()))   
+        self.ggo_other_time_add = generate_address(AddressPrefix.GGO, self.ggo_other_time_key.PublicKey())
+        self.ggo_other_time = GGO.get_schema().dumps(GGO(
+                origin=self.mea_prod_3_add,
+                amount=15,
+                begin=datetime(2020,1,1,13, tzinfo=timezone.utc),
+                end=datetime(2020,1,1,14, tzinfo=timezone.utc),
+                tech_type='T12412',
+                fuel_type='F010101',
+                sector='DK1',
+                next=None
+                )).encode('utf8')
+
         self.ggo_used_key = master_key.ChildKey(2).ChildKey(54687)
         self.ggo_used_signer =  CryptoFactory(context).new_signer(PrivateKey.from_bytes(self.ggo_used_key.PrivateKey()))   
         self.ggo_used_add = generate_address(AddressPrefix.GGO, self.ggo_used_key.PublicKey())
@@ -858,3 +887,69 @@ class TestIssueGGO(unittest.TestCase):
             SettlementHandler().apply(transaction_settlement, context)
 
         self.assertEqual(str(invalid_transaction.exception), 'Invalid to retire more that measurement amount')
+
+
+    @pytest.mark.unittest
+    def test_retire_fail_other_sector(self):
+
+        set_add_1 = generate_address(AddressPrefix.SETTLEMENT, self.mea_con_1_key.PublicKey())
+
+        context = MockContext(states={
+            self.ggo_DK2_add: self.ggo_DK2,
+            self.mea_con_1_add: self.mea_con_1
+            })
+
+        transaction_retire = self.create_fake_transaction(
+            payload=class_schema(RetireGGORequest)().dumps(RetireGGORequest(
+                origin=self.ggo_DK2_add,
+                settlement_address=set_add_1
+            )).encode('utf8'),
+            signer_key=self.ggo_DK2_key)
+
+        transaction_settlement = self.create_fake_transaction(
+            payload=class_schema(SettlementRequest)().dumps(SettlementRequest(
+                settlement_address=set_add_1,
+                measurement_address=self.mea_con_1_add,
+                ggo_addresses=[self.ggo_DK2_add]
+            )).encode('utf8'),
+            signer_key=self.mea_con_1_key)
+
+        with self.assertRaises(InvalidTransaction) as invalid_transaction:
+            RetireGGOTransactionHandler().apply(transaction_retire, context)
+            SettlementHandler().apply(transaction_settlement, context)
+
+        self.assertEqual(str(invalid_transaction.exception), 'GGO not produced in same sector as measurement')
+
+
+        
+
+    @pytest.mark.unittest
+    def test_retire_fail_other_time(self):
+
+        set_add_1 = generate_address(AddressPrefix.SETTLEMENT, self.mea_con_1_key.PublicKey())
+
+        context = MockContext(states={
+            self.ggo_other_time_add: self.ggo_other_time,
+            self.mea_con_1_add: self.mea_con_1
+            })
+
+        transaction_retire = self.create_fake_transaction(
+            payload=class_schema(RetireGGORequest)().dumps(RetireGGORequest(
+                origin=self.ggo_other_time_add,
+                settlement_address=set_add_1
+            )).encode('utf8'),
+            signer_key=self.ggo_other_time_key)
+
+        transaction_settlement = self.create_fake_transaction(
+            payload=class_schema(SettlementRequest)().dumps(SettlementRequest(
+                settlement_address=set_add_1,
+                measurement_address=self.mea_con_1_add,
+                ggo_addresses=[self.ggo_other_time_add]
+            )).encode('utf8'),
+            signer_key=self.mea_con_1_key)
+
+        with self.assertRaises(InvalidTransaction) as invalid_transaction:
+            RetireGGOTransactionHandler().apply(transaction_retire, context)
+            SettlementHandler().apply(transaction_settlement, context)
+
+        self.assertEqual(str(invalid_transaction.exception), 'GGO not produced at the same time as measurement')
