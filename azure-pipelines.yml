@@ -10,7 +10,7 @@ resources:
 
 variables:
   imageName: 'projectorigin/ledger_tp'
-
+  tag: '$(Build.BuildId)'
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
@@ -63,7 +63,7 @@ stages:
       inputs:
         command: push
         repository: $(imageName)
-        containerRegistry: $(dockerHub)
+        containerRegistry: dockerHub
         tags: |
-          test1
-          test2
+          latest
+          $(tag)
