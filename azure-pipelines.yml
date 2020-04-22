@@ -58,6 +58,9 @@ stages:
         command: build
         repository: $(imageName)
         Dockerfile: Dockerfile
+        tags: |
+          latest
+          $(tag)
     - task: Docker@2
       displayName: Push image
       inputs:
