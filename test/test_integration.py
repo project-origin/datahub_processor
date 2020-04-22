@@ -211,7 +211,7 @@ class TestIntegration(unittest.TestCase):
     @pytest.mark.trylast
     def test_integration(self):
 
-        with DockerCompose(".") as compose:
+        with DockerCompose("./test") as compose:
             time.sleep(5)
 
             host = compose.get_service_host('rest-api', 8008)
