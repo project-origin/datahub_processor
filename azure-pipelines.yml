@@ -9,6 +9,8 @@ resources:
 - repo: self
 
 variables:
+  imageName: 'projectorigin/ledger_tp'
+  tag: '$(Build.BuildId)'
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
@@ -42,5 +44,31 @@ stages:
     - script: git submodule update --init --recursive
       displayName: Git get submodules
 
-    - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=90 --cov=src/datahub_processor
+    - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=100 --cov=src/datahub_processor
       displayName: 'Run tests'
+- stage: build_and_publish
+  displayName: Build and publish
+  jobs:  
+  - job: docker_build_push
+    displayName: Docker build and push
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build docker image
+      inputs:
+        command: build
+        repository: $(imageName)
+        Dockerfile: Dockerfile
+        tags: |
+          latest
+          $(tag)
+    - task: Docker@2
+      displayName: Push image
+      inputs:
+        command: push
+        repository: $(imageName)
+        containerRegistry: dockerHub
+        tags: |
+          latest
+          $(tag)

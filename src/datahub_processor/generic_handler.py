@@ -13,14 +13,6 @@ class GenericHandler(TransactionHandler):
  
     TIMEOUT = 3
 
-    def _validate_signature(self, signed_message, obj, key):
-        context = create_context('secp256k1')
-        message = obj.get_signature_bytes()
-        pubKey = PublicKey.from_hex(key)
-        
-        return context.verify(signed_message, message, pubKey)
-
-
     def _map_request(self, clazz: type, payload: bytes):
         try:
             data = payload.decode('utf8')

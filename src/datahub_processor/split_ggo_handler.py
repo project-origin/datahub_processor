@@ -4,7 +4,7 @@ import traceback
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 
 from .generic_handler import GenericHandler
-from .ledger_dto import GGO, SplitGGORequest, GGONext, GGOAction
+from .ledger_dto import GGO, SplitGGORequest, GGONext, GGOAction, generate_address, AddressPrefix
 
 
 class SplitGGOTransactionHandler(GenericHandler):
@@ -33,8 +33,10 @@ class SplitGGOTransactionHandler(GenericHandler):
             if current_ggo.next != None:
                 raise InvalidTransaction('GGO already has been used')
 
-            if current_ggo.key != transaction.header.signer_public_key:
-                raise InvalidTransaction('Unauthorized transfer on GGO')
+            public_key_bytes = bytearray.fromhex(transaction.header.signer_public_key)
+            generated_address = generate_address(AddressPrefix.GGO, public_key_bytes)
+            if generated_address != request.origin:
+                 raise InvalidTransaction('Invalid key for GGO')
 
             if self._addresses_not_empty(context, [p.address for p in request.parts]):
                 raise InvalidTransaction('Destination address not empty')
@@ -52,8 +54,7 @@ class SplitGGOTransactionHandler(GenericHandler):
                     end=current_ggo.end,
                     sector=current_ggo.sector,
                     tech_type=current_ggo.tech_type,
-                    fuel_type=current_ggo.fuel_type,
-                    key=part.key
+                    fuel_type=current_ggo.fuel_type
                 )
                 state_update[part.address] = GGO.get_schema().dumps(split_ggo).encode('utf8')
 

@@ -4,7 +4,7 @@ import traceback
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 
 from .generic_handler import GenericHandler
-from .ledger_dto import GGO, TransferGGORequest, GGONext, GGOAction
+from .ledger_dto import GGO, TransferGGORequest, GGONext, GGOAction, generate_address, AddressPrefix
 
 
 class TransferGGOTransactionHandler(GenericHandler):
@@ -33,8 +33,10 @@ class TransferGGOTransactionHandler(GenericHandler):
             if current_ggo.next != None:
                 raise InvalidTransaction('GGO already has been used')
 
-            if current_ggo.key != transaction.header.signer_public_key:
-                raise InvalidTransaction('Unauthorized transfer on GGO')
+            public_key_bytes = bytearray.fromhex(transaction.header.signer_public_key)
+            generated_address = generate_address(AddressPrefix.GGO, public_key_bytes)
+            if generated_address != request.origin:
+                 raise InvalidTransaction('Invalid key for GGO')
 
             if self._addresses_not_empty(context, [request.destination]):
                 raise InvalidTransaction('Destination address not empty')
@@ -51,8 +53,7 @@ class TransferGGOTransactionHandler(GenericHandler):
                 end=current_ggo.end,
                 sector=current_ggo.sector,
                 tech_type=current_ggo.tech_type,
-                fuel_type=current_ggo.fuel_type,
-                key=request.key
+                fuel_type=current_ggo.fuel_type
             )
 
             payload_current = GGO.get_schema().dumps(current_ggo).encode('utf8')

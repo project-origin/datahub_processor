@@ -2,7 +2,8 @@ import unittest
 import pytest
 import json
 from datetime import datetime, timezone
-from src.datahub_processor.ledger_dto import GGO, SplitGGOPart, SplitGGORequest, GGONext, GGOAction
+from src.datahub_processor.ledger_dto import GGO, SplitGGOPart, SplitGGORequest, GGONext, GGOAction, generate_address, AddressPrefix
+from bip32utils import BIP32Key
 
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 from src.datahub_processor.split_ggo_handler import SplitGGOTransactionHandler
@@ -14,22 +15,19 @@ from marshmallow_dataclass import class_schema
 
 class TestIssueGGO(unittest.TestCase):
 
-    def create_fake_transaction(self, inputs, outputs, payload):
+    def create_fake_transaction(self, inputs, outputs, payload, key: BIP32Key):
         
         return FakeTransaction(
             header=FakeTransactionHeader(
-                batcher_public_key="039c6c728796613c8fc4bff1294df728047a6c9fd0a37b9b8d53f0a09fc4906be8",
+                batcher_public_key=key.PublicKey().hex(),
                 dependencies=[],
                 family_name="datahub",
                 family_version="0.1",
                 inputs=inputs,
                 outputs=outputs,
-                payload_sha512="d70bfa9020d4f03a7ca4e706b81d3d8b3cf93fe9942b83f1e1661517d8da8991708a87ca7a50fd536fdd218e7ebe5385454286693897cd96686dca6f5649256e",
-                signer_public_key="039c6c728796613c8fc4bff1294df728047a6c9fd0a37b9b8d53f0a09fc4906be8"),
-            header_signature="7651c96e081880de546683b7f47ca9124bd398bb7ad5880813a7cb882d2901e405e386730d8ca04aabdfa354b6b66105b1b7e51141d25bf34a0a245004209e45",
+                signer_public_key=key.PublicKey().hex()),
             payload=payload
         )
-
         
     @pytest.mark.unittest
     def test_identifiers(self):
@@ -41,7 +39,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertIn('0.1', handler.family_versions)
 
         self.assertEqual(len(handler.namespaces), 1)
-        self.assertIn('2b7eba', handler.namespaces)
+        self.assertIn('849c0b', handler.namespaces)
 
 
     @pytest.mark.unittest
@@ -56,7 +54,8 @@ class TestIssueGGO(unittest.TestCase):
     @pytest.mark.unittest
     def test_transfer_ggo_success(self):
         
-        ggo_src = 'source_add'
+        key = BIP32Key.fromEntropy("the_valid_key_that_owns_the_specific_ggo".encode())
+        ggo_src = generate_address(AddressPrefix.GGO, key.PublicKey())
 
         ggo = GGO.get_schema().dumps(GGO(
             origin='meaaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c',
@@ -66,7 +65,6 @@ class TestIssueGGO(unittest.TestCase):
             tech_type='T12412',
             fuel_type='F010101',
             sector='DK1',
-            key='039c6c728796613c8fc4bff1294df728047a6c9fd0a37b9b8d53f0a09fc4906be8',
             next=None
             )).encode('utf8')
 
@@ -77,23 +75,24 @@ class TestIssueGGO(unittest.TestCase):
         payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                SplitGGOPart(address="split1_add", amount=10, key="key1"),
-                SplitGGOPart(address="split2_add", amount=20, key="key2"),
-                SplitGGOPart(address="split3_add", amount=50, key="key3")
+                SplitGGOPart(address="split1_add", amount=10),
+                SplitGGOPart(address="split2_add", amount=20),
+                SplitGGOPart(address="split3_add", amount=50)
             ]
         )).encode('utf8')
 
         transaction = self.create_fake_transaction(
             inputs=[ggo_src, "split1_add", "split2_add", "split3_add"],
             outputs=[ggo_src, "split1_add", "split2_add", "split3_add"],
-            payload=payload)
+            payload=payload,
+            key=key)
 
         SplitGGOTransactionHandler().apply(transaction, context)
 
 
         self.assertIn(ggo_src, context.states)
         obj = json.loads(context.states[ggo_src].decode('utf8'))
-        self.assertEqual(len(obj), 9)
+        self.assertEqual(len(obj), 8)
         
         self.assertEqual(obj['origin'], 'meaaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c')
         self.assertEqual(obj['amount'], 80)
@@ -110,7 +109,7 @@ class TestIssueGGO(unittest.TestCase):
         
 
         obj = json.loads(context.states['split1_add'].decode('utf8'))
-        self.assertEqual(len(obj), 9)
+        self.assertEqual(len(obj), 8)
         self.assertEqual(obj['origin'], ggo_src)
         self.assertEqual(obj['amount'], 10)
         self.assertEqual(obj['begin'], '2020-01-01T12:00:00+00:00')
@@ -121,7 +120,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['next'], None)
 
         obj = json.loads(context.states['split2_add'].decode('utf8'))
-        self.assertEqual(len(obj), 9)
+        self.assertEqual(len(obj), 8)
         self.assertEqual(obj['origin'], ggo_src)
         self.assertEqual(obj['amount'], 20)
         self.assertEqual(obj['begin'], '2020-01-01T12:00:00+00:00')
@@ -133,7 +132,7 @@ class TestIssueGGO(unittest.TestCase):
 
 
         obj = json.loads(context.states['split3_add'].decode('utf8'))
-        self.assertEqual(len(obj), 9)
+        self.assertEqual(len(obj), 8)
         self.assertEqual(obj['origin'], ggo_src)
         self.assertEqual(obj['amount'], 50)
         self.assertEqual(obj['begin'], '2020-01-01T12:00:00+00:00')
@@ -147,7 +146,8 @@ class TestIssueGGO(unittest.TestCase):
     @pytest.mark.unittest
     def test_transfer_ggo_sum_not_equal(self):
         
-        ggo_src = 'source_add'
+        key = BIP32Key.fromEntropy("the_valid_key_that_owns_the_specific_ggo".encode())
+        ggo_src = generate_address(AddressPrefix.GGO, key.PublicKey())
 
         ggo = GGO.get_schema().dumps(GGO(
             origin='meaaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c',
@@ -157,7 +157,6 @@ class TestIssueGGO(unittest.TestCase):
             tech_type='T12412',
             fuel_type='F010101',
             sector='DK1',
-            key='039c6c728796613c8fc4bff1294df728047a6c9fd0a37b9b8d53f0a09fc4906be8',
             next=None
             )).encode('utf8')
 
@@ -168,15 +167,16 @@ class TestIssueGGO(unittest.TestCase):
         payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                SplitGGOPart(address="split1_add", amount=10, key="key1"),
-                SplitGGOPart(address="split2_add", amount=20, key="key2"),
+                SplitGGOPart(address="split1_add", amount=10),
+                SplitGGOPart(address="split2_add", amount=20),
             ]
         )).encode('utf8')
 
         transaction = self.create_fake_transaction(
             inputs=[ggo_src, "split1_add", "split2_add", "split3_add"],
             outputs=[ggo_src, "split1_add", "split2_add", "split3_add"],
-            payload=payload)
+            payload=payload,
+            key=key)
 
 
         with self.assertRaises(InvalidTransaction) as invalid_transaction:
@@ -189,7 +189,9 @@ class TestIssueGGO(unittest.TestCase):
     @pytest.mark.unittest
     def test_transfer_ggo_no_src_ggo(self):
         
-        ggo_src = 'ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
+        key = BIP32Key.fromEntropy("the_valid_key_that_owns_the_specific_ggo".encode())
+        ggo_src = generate_address(AddressPrefix.GGO, key.PublicKey())
+
         ggo_dst = 'ggonextc37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
 
         context = MockContext(states={
@@ -198,26 +200,29 @@ class TestIssueGGO(unittest.TestCase):
         payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                SplitGGOPart(address="split1_add", amount=10, key="key1"),
-                SplitGGOPart(address="split2_add", amount=20, key="key2")
+                SplitGGOPart(address="split1_add", amount=10),
+                SplitGGOPart(address="split2_add", amount=20)
             ]
         )).encode('utf8')
 
         transaction = self.create_fake_transaction(
             inputs=[ggo_src, ggo_dst],
             outputs=[ggo_src, ggo_dst],
-            payload=payload)
+            payload=payload,
+            key=key)
    
         with self.assertRaises(InvalidTransaction) as invalid_transaction:
             SplitGGOTransactionHandler().apply(transaction, context)
 
-        self.assertEqual(str(invalid_transaction.exception), 'Address "ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c" does not contain a valid GGO.')
+        self.assertEqual(str(invalid_transaction.exception), f'Address "{ggo_src}" does not contain a valid GGO.')
 
 
     @pytest.mark.unittest
     def test_transfer_ggo_not_available(self):
         
-        ggo_src = 'ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
+        key = BIP32Key.fromEntropy("the_valid_key_that_owns_the_specific_ggo".encode())
+        ggo_src = generate_address(AddressPrefix.GGO, key.PublicKey())
+
         ggo_dst = 'ggonextc37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
 
         ggo = GGO.get_schema().dumps(GGO(
@@ -228,7 +233,6 @@ class TestIssueGGO(unittest.TestCase):
             tech_type='T12412',
             fuel_type='F010101',
             sector='DK1',
-            key='039c6c728796613c8fc4bff1294df728047a6c9fd0a37b9b8d53f0a09fc4906be8',
             next=GGONext(GGOAction.TRANSFER, ['somewhereontheledger'])
             )).encode('utf8')
 
@@ -239,15 +243,16 @@ class TestIssueGGO(unittest.TestCase):
         payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                SplitGGOPart(address="split1_add", amount=10, key="key1"),
-                SplitGGOPart(address="split2_add", amount=20, key="key2")
+                SplitGGOPart(address="split1_add", amount=10),
+                SplitGGOPart(address="split2_add", amount=20)
             ]
         )).encode('utf8')
 
         transaction = self.create_fake_transaction(
             inputs=[ggo_src, ggo_dst],
             outputs=[ggo_src, ggo_dst],
-            payload=payload)
+            payload=payload,
+            key=key)
    
         with self.assertRaises(InvalidTransaction) as invalid_transaction:
             SplitGGOTransactionHandler().apply(transaction, context)
@@ -257,50 +262,11 @@ class TestIssueGGO(unittest.TestCase):
 
     @pytest.mark.unittest
     def test_transfer_ggo_not_authorized(self):
+        key_owner = BIP32Key.fromEntropy("the_valid_key_that_owns_the_specific_ggo".encode())
+        key_criminal = BIP32Key.fromEntropy("this_key_should_not_be_authorized".encode())
         
-        ggo_src = 'ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
-        ggo_dst = 'ggonextc37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
+        ggo_src = generate_address(AddressPrefix.GGO, key_owner.PublicKey())
 
-        ggo = GGO.get_schema().dumps(GGO(
-            origin='meaaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c',
-            amount=123,
-            begin=datetime(2020,1,1,12, tzinfo=timezone.utc),
-            end=datetime(2020,1,1,13, tzinfo=timezone.utc),
-            tech_type='T12412',
-            fuel_type='F010101',
-            sector='DK1',
-            key='ff1294df728047a6c9fd0a37b9b8d5039c6c728796613c8fc4b3f0a09fc4906be8',
-            next=None
-            )).encode('utf8')
-
-        context = MockContext(states={
-            ggo_src: ggo
-        })
-
-        payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
-            origin=ggo_src,
-            parts=[
-                SplitGGOPart(address="split1_add", amount=10, key="key1"),
-                SplitGGOPart(address="split2_add", amount=20, key="key2")
-            ]
-        )).encode('utf8')
-
-        transaction = self.create_fake_transaction(
-            inputs=[ggo_src, ggo_dst],
-            outputs=[ggo_src, ggo_dst],
-            payload=payload)
-   
-        with self.assertRaises(InvalidTransaction) as invalid_transaction:
-            SplitGGOTransactionHandler().apply(transaction, context)
-
-        self.assertEqual(str(invalid_transaction.exception), 'Unauthorized transfer on GGO')
-
-
-
-    @pytest.mark.unittest
-    def test_transfer_ggo_address_not_empty(self):
-        
-        ggo_src = 'ggoaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
         ggo_dst = 'ggonextc37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
 
         ggo = GGO.get_schema().dumps(GGO(
@@ -311,7 +277,50 @@ class TestIssueGGO(unittest.TestCase):
             tech_type='T12412',
             fuel_type='F010101',
             sector='DK1',
-            key='039c6c728796613c8fc4bff1294df728047a6c9fd0a37b9b8d53f0a09fc4906be8',
+            next=None
+            )).encode('utf8')
+
+        context = MockContext(states={
+            ggo_src: ggo
+        })
+
+        payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
+            origin=ggo_src,
+            parts=[
+                SplitGGOPart(address="split1_add", amount=10),
+                SplitGGOPart(address="split2_add", amount=20)
+            ]
+        )).encode('utf8')
+
+        transaction = self.create_fake_transaction(
+            inputs=[ggo_src, ggo_dst],
+            outputs=[ggo_src, ggo_dst],
+            payload=payload,
+            key=key_criminal)
+   
+        with self.assertRaises(InvalidTransaction) as invalid_transaction:
+            SplitGGOTransactionHandler().apply(transaction, context)
+
+        self.assertEqual(str(invalid_transaction.exception), 'Invalid key for GGO')
+
+
+
+    @pytest.mark.unittest
+    def test_transfer_ggo_address_not_empty(self):
+        
+        key = BIP32Key.fromEntropy("the_valid_key_that_owns_the_specific_ggo".encode())
+        ggo_src = generate_address(AddressPrefix.GGO, key.PublicKey())
+
+        ggo_dst = 'ggonextc37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c'
+
+        ggo = GGO.get_schema().dumps(GGO(
+            origin='meaaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c',
+            amount=30,
+            begin=datetime(2020,1,1,12, tzinfo=timezone.utc),
+            end=datetime(2020,1,1,13, tzinfo=timezone.utc),
+            tech_type='T12412',
+            fuel_type='F010101',
+            sector='DK1',
             next=None
             )).encode('utf8')
 
@@ -323,7 +332,6 @@ class TestIssueGGO(unittest.TestCase):
             tech_type='T12412',
             fuel_type='F010101',
             sector='DK1',
-            key='d3f384923f63906ad06ee903a93d2ee81b14c1b5a20356d6560c99daf6fb19e48e',
             next=None
             )).encode('utf8')
 
@@ -336,15 +344,16 @@ class TestIssueGGO(unittest.TestCase):
         payload = class_schema(SplitGGORequest)().dumps(SplitGGORequest(
             origin=ggo_src,
             parts=[
-                SplitGGOPart(address="split1_add", amount=10, key="key1"),
-                SplitGGOPart(address="split2_add", amount=20, key="key2")
+                SplitGGOPart(address="split1_add", amount=10),
+                SplitGGOPart(address="split2_add", amount=20)
             ]
         )).encode('utf8')
 
         transaction = self.create_fake_transaction(
             inputs=[ggo_src, ggo_dst],
             outputs=[ggo_src, ggo_dst],
-            payload=payload)
+            payload=payload,
+            key=key)
    
         with self.assertRaises(InvalidTransaction) as invalid_transaction:
             SplitGGOTransactionHandler().apply(transaction, context)
