@@ -23,6 +23,9 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - script: git submodule update --init --recursive
+      displayName: Git get submodules
+
     - script: sudo mkdir /etc/sawtooth && sudo chmod 777 /etc/sawtooth &&
               sudo mkdir /var/lib/sawtooth && sudo chmod 777 /var/lib/sawtooth &&
               sudo mkdir /var/log/sawtooth && sudo chmod 777 /var/log/sawtooth
@@ -41,9 +44,6 @@ stages:
     - script: python -m pip install -r requirements.txt
       displayName: 'Install requirements'
 
-    - script: git submodule update --init --recursive
-      displayName: Git get submodules
-
     - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=100 --cov=src/datahub_processor
       displayName: 'Run tests'
 - stage: build_and_publish
@@ -54,6 +54,9 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - script: git submodule update --init --recursive
+      displayName: Git get submodules
+
     - task: Docker@2
       displayName: Build docker image
       inputs:
