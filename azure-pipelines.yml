@@ -46,7 +46,9 @@ stages:
 
     - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=100 --cov=src/datahub_processor
       displayName: 'Run tests'
-    
+- stage: build_and_publish
+  displayName: Build and publish
+  jobs:  
   - job: docker_build_push
     displayName: Docker build and push
     pool:
