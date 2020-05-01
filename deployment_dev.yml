@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hyperledger-sawtooth-deployment
+  name: hyperledger-deployment
   namespace: project-origin
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hyperledger-sawtooth-deployment
+      app: hyperledger-deployment
   template:
     metadata:
       labels:
-        app: hyperledger-sawtooth-deployment
+        app: hyperledger-deployment
     spec:
       containers:
 
@@ -62,7 +62,7 @@ spec:
           command: ["devmode-engine-rust", "-C", "tcp://127.0.0.1:5050"]
 
         - name: hyperledger-sawtooth-ledger-tp-container
-          image: projectorigin/ledger_tp:2132
+          image: projectorigin/ledger_tp:2161
           env:
             - name: 'LEDGER_URL'
               value: 'tcp://127.0.0.1:4004'
