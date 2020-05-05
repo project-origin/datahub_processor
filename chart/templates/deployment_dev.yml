@@ -1,20 +1,7 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: hyperledger-service
-  namespace: project-origin
-spec:
-  ports:
-  - port: 80
-    targetPort: 8008
-  selector:
-    app: hyperledger-sawtooth-deployment
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hyperledger-sawtooth-deployment
-  namespace: project-origin
 spec:
   replicas: 1
   selector:
@@ -74,7 +61,7 @@ spec:
         command: ["devmode-engine-rust", "-C", "tcp://127.0.0.1:5050"]
 
       - name: hyperledger-sawtooth-ledger-tp-container
-        image: projectorigin/ledger_tp:latest
+        image: projectorigin/ledger_tp:{{ .Values.tag }}
         env:
         - name: 'LEDGER_URL'
           value: 'tcp://127.0.0.1:4004'
