@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hyperledger-sawtooth-deployment
+  name: hyperledger-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hyperledger-sawtooth-deployment
+      app: hyperledger-deployment
   template:
     metadata:
       labels:
-        app: hyperledger-sawtooth-deployment
+        app: hyperledger-deployment
     spec:
       containers:
 
