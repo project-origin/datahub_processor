@@ -99,7 +99,7 @@ stages:
           kubernetesServiceConnection: $(kubeCon)
           namespace: $(namespace)
           command: uninstall
-          releaseName: ledger-tp
+          arguments: ledger-tp
           waitForExecution: true
       - task: HelmDeploy@0
         displayName: Helm upgrade
