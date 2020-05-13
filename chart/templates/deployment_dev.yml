@@ -82,7 +82,7 @@ spec:
       volumes:
         - name: ledger-key
           persistentVolumeClaim:
-          claimName: ledger-key-disk
+            claimName: ledger-key-disk
 
         - name: ledger-storage
           persistentVolumeClaim:
