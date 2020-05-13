@@ -14,17 +14,17 @@ spec:
     spec:
       containers:
 
-      - name: hyperledger-sawtooth-rest-api-container
-        image: hyperledger/sawtooth-rest-api:1.2.4
-        ports:
-        - containerPort: 8008
-        command:
-        - sawtooth-rest-api
-        args:
-        - -C
-        - tcp://127.0.0.1:4004
-        - --bind
-        - 0.0.0.0:8008
+        - name: hyperledger-sawtooth-rest-api-container
+          image: hyperledger/sawtooth-rest-api:1.2.4
+          ports:
+            - containerPort: 8008
+          command:
+            - sawtooth-rest-api
+          args:
+            - -C
+            - tcp://127.0.0.1:4004
+            - --bind
+            - 0.0.0.0:8008
 
       - name: sawtooth-settings-tp
         image: hyperledger/sawtooth-settings-tp:1.2.4
