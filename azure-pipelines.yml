@@ -94,6 +94,7 @@ stages:
     steps:
       - task: HelmDeploy@0
         displayName: Helm uninstall
+        continueOnError: true
         inputs:
           connectionType: 'Kubernetes Service Connection'
           kubernetesServiceConnection: $(kubeCon)
