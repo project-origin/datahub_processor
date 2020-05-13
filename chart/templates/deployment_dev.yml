@@ -78,13 +78,13 @@ spec:
               mountPath: /etc/sawtooth/keys
             - name: ledger-storage
               mountPath: /var/lib/sawtooth
-              
-        volumes:
-          - name: ledger-key
-            persistentVolumeClaim:
+            
+      volumes:
+        - name: ledger-key
+          persistentVolumeClaim:
             claimName: ledger-key-disk
 
-          - name: ledger-storage
-            persistentVolumeClaim:
-              claimName: ledger-storage-disk
+        - name: ledger-storage
+          persistentVolumeClaim:
+            claimName: ledger-storage-disk
 

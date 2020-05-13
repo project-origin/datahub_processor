@@ -93,6 +93,16 @@ stages:
       vmImage: $(vmImageName)
     steps:
       - task: HelmDeploy@0
+        displayName: Helm uninstall
+        continueOnError: true
+        inputs:
+          connectionType: 'Kubernetes Service Connection'
+          kubernetesServiceConnection: $(kubeCon)
+          namespace: $(namespace)
+          command: uninstall
+          arguments: ledger-tp
+          waitForExecution: true
+      - task: HelmDeploy@0
         displayName: Helm upgrade
         inputs:
           connectionType: 'Kubernetes Service Connection'
