@@ -36,7 +36,7 @@ spec:
 
         - name: hyperledger-sawtooth-devmode-engine-container
           image: hyperledger/sawtooth-devmode-engine-rust:1.2
-          command: ["devmode-engine-rust", "-C", "tcp://127.0.0.1:5050"]
+          command: ["devmode-engine-rust", "-vv", "-C", "tcp://127.0.0.1:5050"]
 
         - name: hyperledger-sawtooth-ledger-tp-container
           image: projectorigin/ledger_tp:{{ .Values.tag }}
