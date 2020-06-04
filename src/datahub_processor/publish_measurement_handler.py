@@ -7,7 +7,6 @@ from marshmallow_dataclass import class_schema
 from .generic_handler import GenericHandler
 from .ledger_dto import Measurement, PublishMeasurementRequest
 
-measurement_schema = class_schema(Measurement)
 
 class PublishMeasurementTransactionHandler(GenericHandler):
 
@@ -44,7 +43,7 @@ class PublishMeasurementTransactionHandler(GenericHandler):
                     sector=request.sector
                 )
 
-            payload = measurement_schema(exclude=["address"]).dumps(measurement).encode('utf8')
+            payload = Measurement.get_schema().dumps(measurement).encode('utf8')
 
             context.set_state(
                 {address: payload}, 
