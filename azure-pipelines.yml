@@ -1,19 +1,23 @@
-# Docker
-# Build and push an image to Azure Container Registry
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
-- master
-- develop
+  branches:
+    include:
+    - master
+    - test
+    - develop
+
+# no PR triggers
+pr: none
 
 resources:
 - repo: self
 
 variables:
   imageName: 'projectorigin/ledger_tp'
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
   ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+    kubeCon: 'kubecon-eloprindelse-prod'
+    tag: '$(Build.BuildId)'
+    namespace: 'eloprindelse'
+  ${{ if eq(variables['Build.SourceBranchName'], 'test') }}:
     kubeCon: 'test-kube-con'
     tag: '$(Build.BuildId)'
     namespace: 'test-project-origin'
@@ -22,76 +26,64 @@ variables:
     tag: 'dev.$(Build.BuildId)'
     namespace: 'dev-project-origin'
 
-stages:
-- stage: Test
-  displayName: Unit test the code
-  jobs:  
-  - job: Test
-    displayName: Unit tests
+jobs:  
+  - job: build_deploy
+    displayName: Build and Deploy
     pool:
-      vmImage: $(vmImageName)
+      ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+        name: eloprindelse-prod
+      ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
+        vmImage: 'ubuntu-latest'
+
     steps:
-    - script: git submodule update --init --recursive
-      displayName: Git get submodules
 
-    - script: sudo mkdir /etc/sawtooth && sudo chmod 777 /etc/sawtooth &&
-              sudo mkdir /var/lib/sawtooth && sudo chmod 777 /var/lib/sawtooth &&
-              sudo mkdir /var/log/sawtooth && sudo chmod 777 /var/log/sawtooth
-      displayName: Create sawtooth folders
+      - script: git submodule update --init --recursive
+        displayName: Git get submodules
 
-    - script: sudo apt update
-      displayName: Update repo
+      - script: sudo mkdir /etc/sawtooth && sudo chmod 777 /etc/sawtooth &&
+                sudo mkdir /var/lib/sawtooth && sudo chmod 777 /var/lib/sawtooth &&
+                sudo mkdir /var/log/sawtooth && sudo chmod 777 /var/log/sawtooth
+        displayName: Create sawtooth folders
 
-    - script: sudo apt install -y pkg-config gcc libsecp256k1-dev libzmq3-dev
-      displayName: Install packages
+      - script: sudo apt update
+        displayName: Update repo
 
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '3.7'
+      - script: sudo apt install -y pkg-config gcc libsecp256k1-dev libzmq3-dev
+        displayName: Install packages
 
-    - script: python -m pip install -r requirements.txt
-      displayName: 'Install requirements'
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.7'
 
-    - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=100 --cov=src/datahub_processor
-      displayName: 'Run tests'
-- stage: build_and_publish
-  displayName: Build and publish
-  jobs:  
-  - job: docker_build_push
-    displayName: Docker build and push
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - script: git submodule update --init --recursive
-      displayName: Git get submodules
+      - script: python -m pip install -r requirements.txt
+        displayName: 'Install requirements'
 
-    - task: Docker@2
-      displayName: Build docker image
-      inputs:
-        command: build
-        repository: $(imageName)
-        Dockerfile: Dockerfile
-        tags: |
-          latest
-          $(tag)
-    - task: Docker@2
-      displayName: Push image
-      inputs:
-        command: push
-        repository: $(imageName)
-        containerRegistry: dockerHub
-        tags: |
-          latest
-          $(tag)
+      - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=100 --cov=src/datahub_processor
+        displayName: 'Run tests'
 
-- stage: update_cluster
-  displayName: Update kubernetes
-  jobs:  
-  - job: push_to_cluster
-    displayName: Push to Cluster
-    pool:
-      vmImage: $(vmImageName)
-    steps:
+      - script: git submodule update --init --recursive
+        displayName: Git get submodules
+
+      - task: Docker@2
+        displayName: Build docker image
+        inputs:
+          command: build
+          repository: $(imageName)
+          Dockerfile: Dockerfile
+          tags: |
+            latest
+            $(tag)
+
+      - task: Docker@2
+        displayName: Push image
+        inputs:
+          command: push
+          repository: $(imageName)
+          containerRegistry: dockerHub
+          tags: |
+            latest
+            $(tag)
+
       - task: HelmDeploy@0
         displayName: Helm uninstall
         continueOnError: true
@@ -102,6 +94,7 @@ stages:
           command: uninstall
           arguments: ledger-tp
           waitForExecution: true
+          
       - task: HelmDeploy@0
         displayName: Helm upgrade
         inputs:
