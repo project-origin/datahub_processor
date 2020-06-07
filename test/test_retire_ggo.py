@@ -675,7 +675,7 @@ class TestIssueGGO(unittest.TestCase):
         context = MockContext(states={
             self.ggo_1_add: self.ggo_1,
             self.mea_con_1_add: self.mea_con_1,
-            set_add_1: class_schema(Settlement)().dumps(Settlement(
+            set_add_1: Settlement.get_schema().dumps(Settlement(
                 measurement=self.mea_con_2_add,
                 parts=[]
             )).encode()
@@ -711,7 +711,7 @@ class TestIssueGGO(unittest.TestCase):
         context = MockContext(states={
             self.ggo_1_add: self.ggo_1,
             self.mea_con_1_add: self.mea_con_1,
-            set_add_1: class_schema(Settlement)().dumps(Settlement(
+            set_add_1: Settlement.get_schema().dumps(Settlement(
                 measurement=self.mea_con_1_add,
                 parts=[]
             )).encode()

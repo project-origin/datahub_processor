@@ -13,5 +13,13 @@ def main(url):
     processor.start()
     
 if __name__ == "__main__":
-    url = os.getenv('LEDGER_URL')
+
+    url = os.getenv('LEDGER_URL', default=None)
+
+    if url is None:
+        host = os.getenv('HOSTNAME', default='localhost')
+        url = f'tcp://{host}:4004'
+
+    print(f'Connecting to "{url}"')
+
     main(url)
