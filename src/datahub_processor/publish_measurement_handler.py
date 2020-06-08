@@ -48,6 +48,9 @@ class PublishMeasurementTransactionHandler(GenericHandler):
             context.set_state(
                 {address: payload}, 
                 self.TIMEOUT)
+
+            print("PublishMeasurementTransactionHandler", "address", address)
+            
             
         except InvalidTransaction as ex:
             track = traceback.format_exc()

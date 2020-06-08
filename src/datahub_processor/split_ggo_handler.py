@@ -68,6 +68,8 @@ class SplitGGOTransactionHandler(GenericHandler):
             context.set_state(
                 state_update, 
                 self.TIMEOUT)
+
+            print("SplitGGOTransactionHandler", "origin:", request.origin, "parts", ";".join([p.address for p in request.parts]))
             
         except InvalidTransaction as ex:
             track = traceback.format_exc()

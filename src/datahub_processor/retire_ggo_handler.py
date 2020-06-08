@@ -52,6 +52,9 @@ class RetireGGOTransactionHandler(GenericHandler):
                 }, 
                 self.TIMEOUT)
 
+            print("IssueGGOTransactionHandler", "origin", request.origin, "settlement", request.settlement_address)
+            
+
         except InvalidTransaction as ex:
             track = traceback.format_exc()
             print("InvalidException", ex)

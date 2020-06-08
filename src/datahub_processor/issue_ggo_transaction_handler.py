@@ -52,6 +52,8 @@ class IssueGGOTransactionHandler(GenericHandler):
             context.set_state(
                 {request.destination: payload}, 
                 self.TIMEOUT)
+
+            print("IssueGGOTransactionHandler", "origin", request.origin, "destination", request.destination)
             
         except InvalidTransaction as ex:
             track = traceback.format_exc()

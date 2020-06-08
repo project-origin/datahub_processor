@@ -102,6 +102,8 @@ class SettlementHandler(GenericHandler):
                     request.settlement_address:  Settlement.get_schema().dumps(settlement).encode('utf8')
                 }, 
                 self.TIMEOUT)
+
+            print("SplitGGOTransactionHandler", "measurement", request.measurement_address, "settlement", request.settlement_address)
             
         except InvalidTransaction as ex:
             track = traceback.format_exc()

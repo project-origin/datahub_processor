@@ -65,6 +65,8 @@ class TransferGGOTransactionHandler(GenericHandler):
                     request.destination: payload_new
                 }, 
                 self.TIMEOUT)
+
+            print("TransferGGOTransactionHandler", "origin", request.origin, "destination", request.destination)
           
         except InvalidTransaction as ex:
             track = traceback.format_exc()
