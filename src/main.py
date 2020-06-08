@@ -16,7 +16,11 @@ def main(url):
     
 if __name__ == "__main__":
 
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="[%(asctime)s %(levelname)s %(name)s] %(message)s",
+        stream=sys.stdout)
+        
 
     url = os.getenv('LEDGER_URL', default=None)
 
