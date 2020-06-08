@@ -1,6 +1,8 @@
 import os
 import hashlib
 import traceback
+import logging
+
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 
 from .generic_handler import GenericHandler
@@ -103,16 +105,12 @@ class SettlementHandler(GenericHandler):
                 }, 
                 self.TIMEOUT)
 
-            print("SplitGGOTransactionHandler", "measurement", request.measurement_address, "settlement", request.settlement_address)
+            logging.info(f'Settlement - measurement={ request.measurement_address } settlement={ request.settlement_address }')
             
         except InvalidTransaction as ex:
-            track = traceback.format_exc()
-            print("InvalidException", ex)
-            print("InvalidTrack", track)
+            logging.exception('InvalidException')
             raise
             
         except Exception as ex:
-            track = traceback.format_exc()
-            print("Exception", ex)
-            print("Track", track)
+            logging.exception('Exception')
             raise InternalError('An unknown error has occured.')

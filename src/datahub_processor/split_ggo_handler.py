@@ -1,6 +1,8 @@
 import os
 import hashlib
 import traceback
+import logging
+
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 
 from .generic_handler import GenericHandler
@@ -69,16 +71,12 @@ class SplitGGOTransactionHandler(GenericHandler):
                 state_update, 
                 self.TIMEOUT)
 
-            print("SplitGGOTransactionHandler", "origin:", request.origin, "parts", ";".join([p.address for p in request.parts]))
+            logging.info(f'Split GGO - origin={ request.origin } parts=[{ ";".join([p.address for p in request.parts]) }]')
             
         except InvalidTransaction as ex:
-            track = traceback.format_exc()
-            print("InvalidException", ex)
-            print("InvalidTrack", track)
+            logging.exception('InvalidException')
             raise
             
         except Exception as ex:
-            track = traceback.format_exc()
-            print("Exception", ex)
-            print("Track", track)
+            logging.exception('Exception')
             raise InternalError('An unknown error has occured.')

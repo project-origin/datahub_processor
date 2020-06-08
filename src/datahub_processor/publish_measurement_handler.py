@@ -1,6 +1,8 @@
 import os
 import hashlib
 import traceback
+import logging
+
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 from marshmallow_dataclass import class_schema
 
@@ -49,19 +51,14 @@ class PublishMeasurementTransactionHandler(GenericHandler):
                 {address: payload}, 
                 self.TIMEOUT)
 
-            print("PublishMeasurementTransactionHandler", "address", address)
-            
+            logging.info(f'PublishMeasurement - address={ address }')
             
         except InvalidTransaction as ex:
-            track = traceback.format_exc()
-            print("InvalidException", ex)
-            print("InvalidTrack", track)
+            logging.exception('InvalidException')
             raise
             
         except Exception as ex:
-            track = traceback.format_exc()
-            print("Exception", ex)
-            print("Track", track)
+            logging.exception('Exception')
             raise InternalError('An unknown error has occured.')
 
     def validate_transaction(self, transaction):
