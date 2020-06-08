@@ -1,4 +1,6 @@
 import os
+import logging
+import sys
 from sawtooth_sdk.processor.core import TransactionProcessor
 from datahub_processor import PublishMeasurementTransactionHandler,  IssueGGOTransactionHandler, TransferGGOTransactionHandler, SplitGGOTransactionHandler, RetireGGOTransactionHandler, SettlementHandler
 
@@ -13,6 +15,8 @@ def main(url):
     processor.start()
     
 if __name__ == "__main__":
+
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG
 
     url = os.getenv('LEDGER_URL', default=None)
 
