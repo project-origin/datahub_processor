@@ -25,86 +25,97 @@ variables:
     kubeCon: 'dev-kube-con'
     tag: 'dev.$(Build.BuildId)'
     namespace: 'dev-project-origin'
+    
+stages:
+  - stage: Test
+    displayName: Unit test the code
+    jobs:  
+      - job: build_deploy
+        displayName: Build and Deploy
+        pool:
+            vmImage: 'ubuntu-latest'
 
-jobs:  
-  - job: build_deploy
-    displayName: Build and Deploy
-    pool:
-      ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
-        name: eloprindelse-prod
-      ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
-        vmImage: 'ubuntu-latest'
+        steps:
+          - script: git submodule update --init --recursive
+            displayName: Git get submodules
 
-    steps:
+          - script: sudo mkdir -p /etc/sawtooth && sudo chmod 777 /etc/sawtooth &&
+                    sudo mkdir -p /var/lib/sawtooth && sudo chmod 777 /var/lib/sawtooth &&
+                    sudo mkdir -p /var/log/sawtooth && sudo chmod 777 /var/log/sawtooth
+            displayName: Create sawtooth folders
 
-      - script: git submodule update --init --recursive
-        displayName: Git get submodules
+          - script: sudo apt update
+            displayName: Update repo
 
-      - script: sudo mkdir -p /etc/sawtooth && sudo chmod 777 /etc/sawtooth &&
-                sudo mkdir -p /var/lib/sawtooth && sudo chmod 777 /var/lib/sawtooth &&
-                sudo mkdir -p /var/log/sawtooth && sudo chmod 777 /var/log/sawtooth
-        displayName: Create sawtooth folders
+          - script: sudo apt install -y pkg-config gcc libsecp256k1-dev libzmq3-dev
+            displayName: Install packages
 
-      - script: sudo apt update
-        displayName: Update repo
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.7'
 
-      - script: sudo apt install -y pkg-config gcc libsecp256k1-dev libzmq3-dev
-        displayName: Install packages
+          - script: python -m pip install -r requirements.txt
+            displayName: 'Install requirements'
 
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.7'
+          - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=100 --cov=src/datahub_processor
+            displayName: 'Run tests'
 
-      - script: python -m pip install -r requirements.txt
-        displayName: 'Install requirements'
+          - script: git submodule update --init --recursive
+            displayName: Git get submodules
 
-      - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=100 --cov=src/datahub_processor
-        displayName: 'Run tests'
+          - task: Docker@2
+            displayName: Build docker image
+            inputs:
+              command: build
+              repository: $(imageName)
+              Dockerfile: Dockerfile
+              tags: |
+                latest
+                $(tag)
 
-      - script: git submodule update --init --recursive
-        displayName: Git get submodules
+          - task: Docker@2
+            displayName: Push image
+            inputs:
+              command: push
+              repository: $(imageName)
+              containerRegistry: dockerHub
+              tags: |
+                latest
+                $(tag)
 
-      - task: Docker@2
-        displayName: Build docker image
-        inputs:
-          command: build
-          repository: $(imageName)
-          Dockerfile: Dockerfile
-          tags: |
-            latest
-            $(tag)
+  - stage: deploy
+    displayName: Deploy to kubernetes
+    jobs:  
+      - job: deploy
+        displayName:  Deploy to kubernetes
+        pool:
+          ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+            name: eloprindelse-prod
+          ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
+            vmImage: 'ubuntu-latest'
 
-      - task: Docker@2
-        displayName: Push image
-        inputs:
-          command: push
-          repository: $(imageName)
-          containerRegistry: dockerHub
-          tags: |
-            latest
-            $(tag)
-
-      - task: HelmDeploy@0
-        displayName: Helm uninstall
-        continueOnError: true
-        inputs:
-          connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceConnection: $(kubeCon)
-          namespace: $(namespace)
-          command: uninstall
-          arguments: ledger-tp
-          waitForExecution: true
-          
-      - task: HelmDeploy@0
-        displayName: Helm upgrade
-        inputs:
-          connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceConnection: $(kubeCon)
-          namespace: $(namespace)
-          command: upgrade
-          chartType: filepath
-          chartPath: ./chart
-          releaseName: ledger-tp
-          overrideValues: tag=$(tag)
-          install: true
-          waitForExecution: true
+        steps:
+          - task: HelmDeploy@0
+            displayName: Helm uninstall
+            continueOnError: true
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceConnection: $(kubeCon)
+              namespace: $(namespace)
+              command: uninstall
+              arguments: ledger-tp
+              waitForExecution: true
+              
+          - task: HelmDeploy@0
+            displayName: Helm upgrade
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceConnection: $(kubeCon)
+              namespace: $(namespace)
+              command: upgrade
+              chartType: filepath
+              chartPath: ./chart
+              releaseName: ledger-tp
+              overrideValues: tag=$(tag)
+              install: true
+              waitForExecution: true
