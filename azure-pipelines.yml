@@ -19,7 +19,7 @@ variables:
     namespace: 'eloprindelse'
   ${{ if eq(variables['Build.SourceBranchName'], 'test') }}:
     kubeCon: 'test-kube-con'
-    tag: '$(Build.BuildId)'
+    tag: 'test.$(Build.BuildId)'
     namespace: 'test-project-origin'
   ${{ if eq(variables['Build.SourceBranchName'], 'develop') }}:
     kubeCon: 'dev-kube-con'
@@ -40,9 +40,9 @@ jobs:
       - script: git submodule update --init --recursive
         displayName: Git get submodules
 
-      - script: sudo mkdir /etc/sawtooth && sudo chmod 777 /etc/sawtooth &&
-                sudo mkdir /var/lib/sawtooth && sudo chmod 777 /var/lib/sawtooth &&
-                sudo mkdir /var/log/sawtooth && sudo chmod 777 /var/log/sawtooth
+      - script: sudo mkdir -p /etc/sawtooth && sudo chmod 777 /etc/sawtooth &&
+                sudo mkdir -p /var/lib/sawtooth && sudo chmod 777 /var/lib/sawtooth &&
+                sudo mkdir -p /var/log/sawtooth && sudo chmod 777 /var/log/sawtooth
         displayName: Create sawtooth folders
 
       - script: sudo apt update
