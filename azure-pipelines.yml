@@ -15,25 +15,26 @@ variables:
   imageName: 'projectorigin/ledger_tp'
   ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
     kubeCon: 'kubecon-eloprindelse-prod'
-    tag: '$(Build.BuildId)'
     namespace: 'eloprindelse'
+    tag: '$(Build.BuildId)'
   ${{ if eq(variables['Build.SourceBranchName'], 'test') }}:
     kubeCon: 'test-kube-con'
-    tag: 'test.$(Build.BuildId)'
     namespace: 'test-project-origin'
+    tag: 'test.$(Build.BuildId)'
   ${{ if eq(variables['Build.SourceBranchName'], 'develop') }}:
     kubeCon: 'dev-kube-con'
-    tag: 'dev.$(Build.BuildId)'
     namespace: 'dev-project-origin'
-    
+    tag: 'canary'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
 stages:
   - stage: Test
     displayName: Unit test the code
     jobs:  
       - job: build_deploy
         displayName: Build and Deploy
-        pool:
-            vmImage: 'ubuntu-latest'
 
         steps:
           - script: git submodule update --init --recursive
@@ -88,24 +89,7 @@ stages:
     jobs:  
       - job: deploy
         displayName:  Deploy to kubernetes
-        pool:
-          ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
-            name: eloprindelse-prod
-          ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
-            vmImage: 'ubuntu-latest'
-
         steps:
-          - task: HelmDeploy@0
-            displayName: Helm uninstall
-            continueOnError: true
-            inputs:
-              connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceConnection: $(kubeCon)
-              namespace: $(namespace)
-              command: uninstall
-              arguments: ledger-tp
-              waitForExecution: true
-              
           - task: HelmDeploy@0
             displayName: Helm upgrade
             inputs:
