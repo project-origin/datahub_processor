@@ -52,7 +52,7 @@ spec:
               tcp://${HOSTNAME}:4004
 
         - name: origin-processor-1
-          image: projectorigin/ledger_tp:{{ .Values.tag }}
+          image: projectorigin/ledger-tp:{{ .Values.tag }}
           imagePullPolicy: Always
 
         - name: engine
