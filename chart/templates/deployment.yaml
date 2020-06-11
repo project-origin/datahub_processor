@@ -53,6 +53,7 @@ spec:
 
         - name: origin-processor-1
           image: projectorigin/ledger_tp:{{ .Values.tag }}
+          imagePullPolicy: Always
 
         - name: engine
           image: hyperledger/sawtooth-devmode-engine-rust:1.2
