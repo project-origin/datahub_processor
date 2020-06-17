@@ -1,6 +1,8 @@
 import os
 import hashlib
 import traceback
+import logging
+
 from sawtooth_sdk.processor.exceptions import InvalidTransaction, InternalError
 
 from .generic_handler import GenericHandler
@@ -52,14 +54,12 @@ class RetireGGOTransactionHandler(GenericHandler):
                 }, 
                 self.TIMEOUT)
 
+            logging.info(f'IssueGGO - origin={ request.origin } settlement={ request.settlement_address }')
+            
         except InvalidTransaction as ex:
-            track = traceback.format_exc()
-            print("InvalidException", ex)
-            print("InvalidTrack", track)
+            logging.exception('InvalidException')
             raise
             
         except Exception as ex:
-            track = traceback.format_exc()
-            print("Exception", ex)
-            print("Track", track)
+            logging.exception('Exception')
             raise InternalError('An unknown error has occured.')

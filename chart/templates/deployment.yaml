@@ -1,0 +1,104 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hyperledger-deployment
+spec:
+  serviceName: "ledger"
+  selector:
+    matchLabels:
+      app: hyperledger-deployment
+  updateStrategy:
+    type: RollingUpdate
+  replicas: 1 # Only supports single node currently!
+  template:
+    metadata:
+      labels:
+        app: hyperledger-deployment
+    spec:
+      volumes:
+        - name: ledger-key
+          persistentVolumeClaim:
+            claimName: ledger-key-disk
+
+        - name: ledger-storage
+          persistentVolumeClaim:
+            claimName: ledger-storage-disk
+
+      containers:
+        - name: rest-api
+          image: hyperledger/sawtooth-rest-api:1.2.4
+          ports:
+            - containerPort: 8008
+          command:
+            - bash
+            - -c
+          args:
+            - sawtooth-rest-api
+              -C 
+              tcp://${HOSTNAME}:4004
+              --bind
+              0.0.0.0:8008
+
+        - name: settings-processor
+          image: hyperledger/sawtooth-settings-tp:1.2.4
+          command:
+            - bash
+            - -c
+          args:
+            - settings-tp
+              -v
+              -C 
+              tcp://${HOSTNAME}:4004
+
+        - name: origin-processor-1
+          image: projectorigin/ledger-tp:{{ .Values.tag }}
+
+        - name: engine
+          image: hyperledger/sawtooth-devmode-engine-rust:1.2
+          command:
+            - bash
+            - -c
+          args:
+            - devmode-engine-rust
+              -vv
+              -C 
+              tcp://${HOSTNAME}:5050
+
+        - name: validator
+          image: hyperledger/sawtooth-validator:1.2.4
+          ports:
+            - name: tp
+              containerPort: 4004
+            - name: consensus
+              containerPort: 5050
+            - name: validators
+              containerPort: 8800
+          volumeMounts:
+            - name: ledger-key
+              mountPath: /etc/sawtooth/keys
+            - name: ledger-storage
+              mountPath: /var/lib/sawtooth
+          command:
+            - bash
+            - -c
+          args:
+            - if [ -f /etc/sawtooth/keys/validator.pub ]; then
+                rm -f /var/lib/sawtooth/genesis.batch ;
+              else 
+                sawadm keygen &&
+                sawtooth keygen my_key &&
+                sawset genesis -k /root/.sawtooth/keys/my_key.priv &&
+                sawset proposal create
+                  -k /root/.sawtooth/keys/my_key.priv
+                  sawtooth.consensus.algorithm.name=Devmode
+                  sawtooth.consensus.algorithm.version=0.1
+                  -o config.batch &&
+                sawadm genesis config-genesis.batch config.batch;
+              fi &&
+              sawtooth-validator -vv
+                --endpoint tcp://${HOSTNAME}:8800
+                --bind component:tcp://eth0:4004
+                --bind network:tcp://eth0:8800
+                --bind consensus:tcp://eth0:5050
+                --scheduler parallel;
