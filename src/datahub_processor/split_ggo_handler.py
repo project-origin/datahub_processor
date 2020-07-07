@@ -56,7 +56,8 @@ class SplitGGOTransactionHandler(GenericHandler):
                     end=current_ggo.end,
                     sector=current_ggo.sector,
                     tech_type=current_ggo.tech_type,
-                    fuel_type=current_ggo.fuel_type
+                    fuel_type=current_ggo.fuel_type,
+                    emissions=current_ggo.emissions,
                 )
                 state_update[part.address] = GGO.get_schema().dumps(split_ggo).encode('utf8')
 
