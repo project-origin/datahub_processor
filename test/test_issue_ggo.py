@@ -60,7 +60,17 @@ class TestIssueGGO(unittest.TestCase):
             "origin":mea_add,
             "destination": ggo_add,
             "tech_type":"T12412",
-            "fuel_type":"F010101"
+            "fuel_type":"F010101",
+            "emissions":{
+                "co2": {
+                    "value": 1113342.14,
+                    "unit": "g/Wh",
+                },
+                "so2": {
+                    "value": 9764446,
+                    "unit": "g/Wh",
+                },
+            }
         }).encode('utf8')
 
         transaction = self.create_fake_transaction(
@@ -88,7 +98,17 @@ class TestIssueGGO(unittest.TestCase):
             "origin": mea_add,
             "destination": ggo_add,
             "tech_type":"T12412",
-            "fuel_type":"F010101"
+            "fuel_type":"F010101",
+            "emissions":{
+                "co2": {
+                    "value": 1113342.14,
+                    "unit": "g/Wh",
+                },
+                "so2": {
+                    "value": 9764446,
+                    "unit": "g/Wh",
+                },
+            }
         }).encode('utf8')
 
         transaction = self.create_fake_transaction(
@@ -124,7 +144,17 @@ class TestIssueGGO(unittest.TestCase):
             "origin": mea_add,
             "destination": ggo_add,
             "tech_type":"T12412",
-            "fuel_type":"F010101"
+            "fuel_type":"F010101",
+            "emissions":{
+                "co2": {
+                    "value": 1113342.14,
+                    "unit": "g/Wh",
+                },
+                "so2": {
+                    "value": 9764446,
+                    "unit": "g/Wh",
+                },
+            }
         }).encode('utf8')
 
         transaction = self.create_fake_transaction(
@@ -160,7 +190,17 @@ class TestIssueGGO(unittest.TestCase):
             "origin": mea_add,
             "destination": ggo_add,
             "tech_type":"T12412",
-            "fuel_type":"F010101"
+            "fuel_type":"F010101",
+            "emissions":{
+                "co2": {
+                    "value": 1113342.14,
+                    "unit": "g/Wh",
+                },
+                "so2": {
+                    "value": 9764446,
+                    "unit": "g/Wh",
+                },
+            }
         }).encode('utf8')
 
         transaction = self.create_fake_transaction(
@@ -172,7 +212,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertIn(ggo_add, context.states)
 
         obj = json.loads(context.states[ggo_add].decode('utf8'))
-        self.assertEqual(len(obj), 8)
+        self.assertEqual(len(obj), 9)
 
         self.assertEqual(obj['origin'], mea_add)
         self.assertEqual(obj['amount'], 123)
@@ -181,6 +221,16 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['sector'], 'DK1')
         self.assertEqual(obj['tech_type'], 'T12412')
         self.assertEqual(obj['fuel_type'], 'F010101')
+        self.assertEqual(obj['emissions'], {
+            "co2": {
+                "value": 1113342.14,
+                "unit": "g/Wh",
+            },
+            "so2": {
+                "value": 9764446,
+                "unit": "g/Wh",
+            },
+        })
         self.assertEqual(obj['next'], None)
 
 
@@ -206,7 +256,17 @@ class TestIssueGGO(unittest.TestCase):
             "origin": mea_add,
             "destination": ggo_add,
             "tech_type":"T12412",
-            "fuel_type":"F010101"
+            "fuel_type":"F010101",
+            "emissions":{
+                "co2": {
+                    "value": 1113342.14,
+                    "unit": "g/Wh",
+                },
+                "so2": {
+                    "value": 9764446,
+                    "unit": "g/Wh",
+                },
+            }
         }).encode('utf8')
 
         transaction = self.create_fake_transaction(
