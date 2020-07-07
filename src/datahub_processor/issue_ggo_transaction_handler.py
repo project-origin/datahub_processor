@@ -46,7 +46,8 @@ class IssueGGOTransactionHandler(GenericHandler):
                 end=measurement.end,
                 sector=measurement.sector,
                 tech_type=request.tech_type,
-                fuel_type=request.fuel_type
+                fuel_type=request.fuel_type,
+                emissions=request.emissions,
             )
 
             payload = GGO.get_schema().dumps(new_ggo).encode('utf8')
