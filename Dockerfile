@@ -2,7 +2,8 @@ FROM python:3.7-slim
 
 WORKDIR /root/app
 
-COPY ./requirements.txt requirements.txt
+COPY Pipfile /root/app
+COPY Pipfile.lock /root/app
 
 RUN apt-get update &&\
     apt-get install \
@@ -10,9 +11,9 @@ RUN apt-get update &&\
         libsecp256k1-dev \
         gcc \
         libzmq3-dev -y &&\
-    python3 -m pip install -r requirements.txt &&\
-    rm requirements.txt
+    pip3 install --upgrade twine wheel setuptools pip pipenv &&\
+    pipenv sync
 
 COPY ./src /root/app
 
-ENTRYPOINT ["python3", "main.py"]
+ENTRYPOINT ["pipenv", "run", "main.py"]
