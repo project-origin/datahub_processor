@@ -135,7 +135,7 @@ jobs:
                 chartType: filepath
                 chartPath: ./chart
                 releaseName: $(releaseName)
-                overrideValues: tag=$(tag),workerreplicas=$(workerreplicas)
+                overrideValues: tag=$(tag)
                 install: true
                 waitForExecution: true
         on:
