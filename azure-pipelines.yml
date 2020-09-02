@@ -51,12 +51,14 @@ jobs:
         inputs:
           versionSpec: '3.7'
 
-      - script: python -m pip install -r requirements.txt
-        displayName: 'Install requirements'
+      - script: pip install --upgrade twine wheel setuptools pip pipenv
+        displayName: 'Upgrading/installing Python packages'
 
-      - script: pytest -m unittest --cov-report=term-missing --cov-fail-under=100 --cov=src/datahub_processor
+      - script: python -m pipenv install -d
+        displayName: 'Installing dependencies from Pipenv'
+
+      - script: python -m pipenv run pytest -m unittest --cov-report=term-missing --cov-fail-under=100 --cov=src/datahub_processor
         displayName: 'Run tests'
-
 
   - job: build_and_release
     displayName: Build and Release
