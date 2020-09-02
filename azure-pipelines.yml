@@ -12,6 +12,8 @@ resources:
 - repo: self
 
 variables:
+- name: releaseName
+  value: 'ledger-tp'
 - name: imageName
   value: 'projectorigin/$(releaseName)' 
 - ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
