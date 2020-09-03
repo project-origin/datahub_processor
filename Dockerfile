@@ -16,4 +16,4 @@ RUN apt-get update &&\
 
 COPY ./src /root/app
 
-ENTRYPOINT ["python3", "main.py"]
+ENTRYPOINT ["pipenv", "run", "python", "main.py"]
