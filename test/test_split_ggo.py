@@ -65,7 +65,17 @@ class TestIssueGGO(unittest.TestCase):
             tech_type='T12412',
             fuel_type='F010101',
             sector='DK1',
-            next=None
+            next=None,
+            emissions={
+                "co2": {
+                    "value": 1113342.14,
+                    "unit": "g/Wh",
+                },
+                "so2": {
+                    "value": 9764446,
+                    "unit": "g/Wh",
+                },
+            }
             )).encode('utf8')
 
         context = MockContext(states={
@@ -92,7 +102,7 @@ class TestIssueGGO(unittest.TestCase):
 
         self.assertIn(ggo_src, context.states)
         obj = json.loads(context.states[ggo_src].decode('utf8'))
-        self.assertEqual(len(obj), 8)
+        self.assertEqual(len(obj), 9)
         
         self.assertEqual(obj['origin'], 'meaaaa1c37509b1de4a7f9f1c59e0efc2ed285e7c96c29d5271edd8b4c2714e3c8979c')
         self.assertEqual(obj['amount'], 80)
@@ -101,6 +111,16 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['sector'], 'DK1')
         self.assertEqual(obj['tech_type'], 'T12412')
         self.assertEqual(obj['fuel_type'], 'F010101')
+        self.assertEqual(obj['emissions'], {
+            "co2": {
+                "value": 1113342.14,
+                "unit": "g/Wh",
+            },
+            "so2": {
+                "value": 9764446,
+                "unit": "g/Wh",
+            },
+        })
         self.assertEqual(obj['next']['action'], GGOAction.SPLIT.name)
         self.assertEqual(len(obj['next']['addresses']), 3)
         self.assertEqual(obj['next']['addresses'][0], 'split1_add')
@@ -109,7 +129,7 @@ class TestIssueGGO(unittest.TestCase):
         
 
         obj = json.loads(context.states['split1_add'].decode('utf8'))
-        self.assertEqual(len(obj), 8)
+        self.assertEqual(len(obj), 9)
         self.assertEqual(obj['origin'], ggo_src)
         self.assertEqual(obj['amount'], 10)
         self.assertEqual(obj['begin'], '2020-01-01T12:00:00+00:00')
@@ -117,10 +137,20 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['sector'], 'DK1')
         self.assertEqual(obj['tech_type'], 'T12412')
         self.assertEqual(obj['fuel_type'], 'F010101')
+        self.assertEqual(obj['emissions'], {
+            "co2": {
+                "value": 1113342.14,
+                "unit": "g/Wh",
+            },
+            "so2": {
+                "value": 9764446,
+                "unit": "g/Wh",
+            },
+        })
         self.assertEqual(obj['next'], None)
 
         obj = json.loads(context.states['split2_add'].decode('utf8'))
-        self.assertEqual(len(obj), 8)
+        self.assertEqual(len(obj), 9)
         self.assertEqual(obj['origin'], ggo_src)
         self.assertEqual(obj['amount'], 20)
         self.assertEqual(obj['begin'], '2020-01-01T12:00:00+00:00')
@@ -128,11 +158,21 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['sector'], 'DK1')
         self.assertEqual(obj['tech_type'], 'T12412')
         self.assertEqual(obj['fuel_type'], 'F010101')
+        self.assertEqual(obj['emissions'], {
+            "co2": {
+                "value": 1113342.14,
+                "unit": "g/Wh",
+            },
+            "so2": {
+                "value": 9764446,
+                "unit": "g/Wh",
+            },
+        })
         self.assertEqual(obj['next'], None)
 
 
         obj = json.loads(context.states['split3_add'].decode('utf8'))
-        self.assertEqual(len(obj), 8)
+        self.assertEqual(len(obj), 9)
         self.assertEqual(obj['origin'], ggo_src)
         self.assertEqual(obj['amount'], 50)
         self.assertEqual(obj['begin'], '2020-01-01T12:00:00+00:00')
@@ -140,6 +180,16 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['sector'], 'DK1')
         self.assertEqual(obj['tech_type'], 'T12412')
         self.assertEqual(obj['fuel_type'], 'F010101')
+        self.assertEqual(obj['emissions'], {
+            "co2": {
+                "value": 1113342.14,
+                "unit": "g/Wh",
+            },
+            "so2": {
+                "value": 9764446,
+                "unit": "g/Wh",
+            },
+        })
         self.assertEqual(obj['next'], None)
 
 

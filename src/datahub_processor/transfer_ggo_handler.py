@@ -55,7 +55,8 @@ class TransferGGOTransactionHandler(GenericHandler):
                 end=current_ggo.end,
                 sector=current_ggo.sector,
                 tech_type=current_ggo.tech_type,
-                fuel_type=current_ggo.fuel_type
+                fuel_type=current_ggo.fuel_type,
+                emissions=current_ggo.emissions,
             )
 
             payload_current = GGO.get_schema().dumps(current_ggo).encode('utf8')
