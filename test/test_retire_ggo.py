@@ -74,7 +74,17 @@ class TestIssueGGO(unittest.TestCase):
                 tech_type='T12412',
                 fuel_type='F010101',
                 sector='DK1',
-                next=None
+                next=None,
+                emissions={
+                    "co2": {
+                        "value": 1113342.14,
+                        "unit": "g/Wh",
+                    },
+                    "so2": {
+                        "value": 9764446,
+                        "unit": "g/Wh",
+                    },
+                }
                 )).encode('utf8')
 
         self.ggo_2_key = master_key.ChildKey(2).ChildKey(2)
@@ -88,7 +98,17 @@ class TestIssueGGO(unittest.TestCase):
                 tech_type='T12412',
                 fuel_type='F010101',
                 sector='DK1',
-                next=None
+                next=None,
+                emissions={
+                    "co2": {
+                        "value": 1113342.14,
+                        "unit": "g/Wh",
+                    },
+                    "so2": {
+                        "value": 9764446,
+                        "unit": "g/Wh",
+                    },
+                }
                 )).encode('utf8')
         
         self.ggo_3_key = master_key.ChildKey(2).ChildKey(3)
@@ -102,7 +122,17 @@ class TestIssueGGO(unittest.TestCase):
                 tech_type='T12412',
                 fuel_type='F010101',
                 sector='DK1',
-                next=None
+                next=None,
+                emissions={
+                    "co2": {
+                        "value": 1113342.14,
+                        "unit": "g/Wh",
+                    },
+                    "so2": {
+                        "value": 9764446,
+                        "unit": "g/Wh",
+                    },
+                }
                 )).encode('utf8')
 
         self.ggo_DK2_key = master_key.ChildKey(2).ChildKey(3)
@@ -116,7 +146,17 @@ class TestIssueGGO(unittest.TestCase):
                 tech_type='T12412',
                 fuel_type='F010101',
                 sector='DK2',
-                next=None
+                next=None,
+                emissions={
+                    "co2": {
+                        "value": 1113342.14,
+                        "unit": "g/Wh",
+                    },
+                    "so2": {
+                        "value": 9764446,
+                        "unit": "g/Wh",
+                    },
+                }
                 )).encode('utf8')
 
         
@@ -131,7 +171,17 @@ class TestIssueGGO(unittest.TestCase):
                 tech_type='T12412',
                 fuel_type='F010101',
                 sector='DK1',
-                next=None
+                next=None,
+                emissions={
+                    "co2": {
+                        "value": 1113342.14,
+                        "unit": "g/Wh",
+                    },
+                    "so2": {
+                        "value": 9764446,
+                        "unit": "g/Wh",
+                    },
+                }
                 )).encode('utf8')
 
         self.ggo_used_key = master_key.ChildKey(2).ChildKey(54687)
@@ -148,7 +198,17 @@ class TestIssueGGO(unittest.TestCase):
                 next=GGONext(
                     action=GGOAction.RETIRE,
                     addresses=['mea_con_used_add']
-                )
+                ),
+                emissions={
+                    "co2": {
+                        "value": 1113342.14,
+                        "unit": "g/Wh",
+                    },
+                    "so2": {
+                        "value": 9764446,
+                        "unit": "g/Wh",
+                    },
+                }
                 )).encode('utf8')
 
         self.ggo_used_multiple_key = master_key.ChildKey(2).ChildKey(54687)
@@ -165,7 +225,17 @@ class TestIssueGGO(unittest.TestCase):
                 next=GGONext(
                     action=GGOAction.RETIRE,
                     addresses=['mea_con_used_add', 'mea_con_used_add2']
-                )
+                ),
+                emissions={
+                    "co2": {
+                        "value": 1113342.14,
+                        "unit": "g/Wh",
+                    },
+                    "so2": {
+                        "value": 9764446,
+                        "unit": "g/Wh",
+                    },
+                }
                 )).encode('utf8')
 
 
@@ -183,7 +253,17 @@ class TestIssueGGO(unittest.TestCase):
                 next=GGONext(
                     action=GGOAction.TRANSFER,
                     addresses=['mea_con_used_add']
-                )
+                ),
+                emissions={
+                    "co2": {
+                        "value": 1113342.14,
+                        "unit": "g/Wh",
+                    },
+                    "so2": {
+                        "value": 9764446,
+                        "unit": "g/Wh",
+                    },
+                }
                 )).encode('utf8')
 
 
@@ -271,7 +351,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertIn(self.ggo_1_add, context.states)
 
         obj = json.loads(context.states[self.ggo_1_add].decode('utf8'))
-        self.assertEqual(len(obj), 8)
+        self.assertEqual(len(obj), 9)
         
         self.assertEqual(obj['origin'], self.mea_prod_1_add)
         self.assertEqual(obj['amount'], 10)
@@ -283,6 +363,16 @@ class TestIssueGGO(unittest.TestCase):
         self.assertEqual(obj['next']['action'], GGOAction.RETIRE.value)
         self.assertEqual(len(obj['next']['addresses']), 1)
         self.assertEqual(obj['next']['addresses'][0], set_add)
+        self.assertEqual(obj['emissions'], {
+            "co2": {
+                "value": 1113342.14,
+                "unit": "g/Wh",
+            },
+            "so2": {
+                "value": 9764446,
+                "unit": "g/Wh",
+            },
+        })
 
         self.assertIn(set_add, context.states)
         obj = json.loads(context.states[set_add].decode('utf8'))
@@ -344,7 +434,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertIn(self.ggo_1_add, context.states)
 
         obj = json.loads(context.states[self.ggo_1_add].decode('utf8'))
-        self.assertEqual(len(obj), 8)
+        self.assertEqual(len(obj), 9)
         
         self.assertEqual(obj['origin'], self.mea_prod_1_add)
         self.assertEqual(obj['amount'], 10)
@@ -433,7 +523,7 @@ class TestIssueGGO(unittest.TestCase):
         self.assertIn(self.ggo_1_add, context.states)
 
         obj = json.loads(context.states[self.ggo_1_add].decode('utf8'))
-        self.assertEqual(len(obj), 8)
+        self.assertEqual(len(obj), 9)
         
         self.assertEqual(obj['origin'], self.mea_prod_1_add)
         self.assertEqual(obj['amount'], 10)

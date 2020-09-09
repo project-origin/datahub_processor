@@ -114,7 +114,17 @@ class TestIntegration(unittest.TestCase):
             origin=mea_add,
             destination=ggo_add,
             tech_type='T12441',
-            fuel_type='F12412'
+            fuel_type='F12412',
+            emissions={
+                "co2": {
+                    "value": 1113342.14,
+                    "unit": "g/Wh",
+                },
+                "so2": {
+                    "value": 9764446,
+                    "unit": "g/Wh",
+                },
+            }
         )
 
         return self.send_request(url, request, [mea_add, ggo_add], signer)
