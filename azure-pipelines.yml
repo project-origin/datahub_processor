@@ -19,7 +19,7 @@ variables:
   - name: releaseName
     value: 'ledger-tp'
   - name: checkoutPath
-    value: './datahub_processor'
+    value: 'datahub_processor'
   - name: imageName
     value: 'projectorigin/$(releaseName)'
   - template: vars.yml@templates
@@ -90,7 +90,7 @@ jobs:
       checkoutPath: $(checkoutPath)
       preDeploy:
         - checkout: templates
-          path: ./pipeline-templates
+          path: pipeline-templates
         - script: ls
           displayName: ls1
         - script: ls pipeline-templates
