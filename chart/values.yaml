@@ -1,5 +1,5 @@
 tag: latest
 
 disks:
-  ledger-storage-disk:
-  ledger-key-disk:
+  ledger-storage-disk: /subscriptions/2c63e008-0007-4b92-bfe5-b1fdc94697d5/resourceGroups/mcs-origin-test/providers/Microsoft.Compute/disks/ledger-storage-disk
+  ledger-key-disk: /subscriptions/2c63e008-0007-4b92-bfe5-b1fdc94697d5/resourceGroups/mcs-origin-test/providers/Microsoft.Compute/disks/ledger-key-disk
