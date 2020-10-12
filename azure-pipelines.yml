@@ -86,10 +86,10 @@ jobs:
       releaseName: $(releaseName)
       deploymentEnvironment: $(deploymentEnvironment)
       overrideValues: tag=$(tag)
-      checkoutPath: $(Agent.BuildDirectory)/s/asd
+      checkoutPath: s/asd
       preDeploy:
         - checkout: templates
-          path: $(Agent.BuildDirectory)/s/tplasd
+          path: s/tplasd
         - script: asd1
           displayName: ls1
         - script: ls
