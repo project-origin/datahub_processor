@@ -95,6 +95,8 @@ jobs:
           displayName: ls1
         - script: ls $(Build.SourcesDirectory)
           displayName: ls3
+        - script: dir $(Build.SourcesDirectory)
+          displayName: dir
         - script: ls pipeline-templates
           displayName: ls2
         - script: python3 ./pipeline-templates/yaml_json_converter.py yaml_to_json $(checkoutPath)/chart/values.yaml values.json
