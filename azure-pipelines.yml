@@ -89,12 +89,12 @@ jobs:
       checkoutPath: ./asd
       preDeploy:
         - checkout: templates
-          path: ./tplasd
+          path: ./s/tplasd
         - script: ls
           displayName: ls1
-        - script: ls $(Build.SourcesDirectory)/s
+        - script: ls $(Build.SourcesDirectory)
           displayName: ls3
-        - script: dir $(Build.SourcesDirectory)/s
+        - script: dir $(Build.SourcesDirectory)
           displayName: dir
         - script: ls pipeline-templates
           displayName: ls2
