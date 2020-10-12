@@ -81,7 +81,7 @@ jobs:
 
   - template: job-deploy.yml@templates
     parameters:
-      dependsOn: docker_build
+#      dependsOn: docker_build
       kubeCon: $(kubeCon)
       namespace: $(namespace)
       releaseName: $(releaseName)
