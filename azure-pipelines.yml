@@ -93,10 +93,10 @@ jobs:
           path: tplasd
         - script: ls
           displayName: ls1
-        - script: ls pipeline-templates
-          displayName: ls2
         - script: ls $(Build.SourcesDirectory)
           displayName: ls3
+        - script: ls pipeline-templates
+          displayName: ls2
         - script: python3 ./pipeline-templates/yaml_json_converter.py yaml_to_json $(checkoutPath)/chart/values.yaml values.json
           displayName: Convert values.yaml to values.json
         - task: FileTransform@1
