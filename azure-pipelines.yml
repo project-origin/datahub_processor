@@ -19,7 +19,7 @@ variables:
   - name: releaseName
     value: 'ledger-tp'
   - name: checkoutPath
-    value: '$(Build.SourcesDirectory)/datahub_processor'
+    value: '$(Build.SourcesDirectory)'
   - name: imageName
     value: 'projectorigin/$(releaseName)'
   - template: vars.yml@templates
