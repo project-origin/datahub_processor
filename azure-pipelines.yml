@@ -90,8 +90,6 @@ jobs:
       preDeploy:
         - checkout: templates
           path: s/tplasd
-        - script: asd1
-          displayName: ls1
         - script: ls
           displayName: ls1
         - script: ls $(Agent.BuildDirectory)
