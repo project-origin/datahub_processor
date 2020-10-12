@@ -80,6 +80,8 @@ jobs:
       deploymentEnvironment: $(deploymentEnvironment)
       overrideValues: tag=$(tag)
       preDeploy:
+        - script: ls
+          displayName: ls folder
         - script: python3 pipeline-templates/yaml_json_converter.py yaml_to_json chart/values.yaml values.json
           displayName: Convert values.yaml to values.json
         - task: FileTransform@1
