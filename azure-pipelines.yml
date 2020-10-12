@@ -87,9 +87,9 @@ jobs:
       releaseName: $(releaseName)
       deploymentEnvironment: $(deploymentEnvironment)
       overrideValues: tag=$(tag)
-      checkoutPath: $(Build.SourcesDirectory)/asdasd
+      checkoutPath: $(Build.SourcesDirectory)
       preDeploy:
-        - checkout@v2: templates
+        - checkout: templates
         - script: ls
           displayName: ls1
         - script: ls pipeline-templates
