@@ -31,11 +31,11 @@ pool:
   vmImage: 'ubuntu-latest'
 
 jobs:
-  - job: checkout
-    displayName: Checkout repos
-    steps:
-      - checkout: self
-      - checkout: templates
+#  - job: checkout
+#    displayName: Checkout repos
+#    steps:
+#      - checkout: self
+#      - checkout: templates
 
   # Ledger has custom pytest job, since it requires sawtooth to be installed.
   - job: run_pytest
@@ -86,6 +86,7 @@ jobs:
       deploymentEnvironment: $(deploymentEnvironment)
       overrideValues: tag=$(tag)
       preDeploy:
+        - checkout: templates
         - script: ls
           displayName: ls1
         - script: ls pipeline-templates
