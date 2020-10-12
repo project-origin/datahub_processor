@@ -87,7 +87,7 @@ jobs:
       releaseName: $(releaseName)
       deploymentEnvironment: $(deploymentEnvironment)
       overrideValues: tag=$(tag)
-      checkoutPath: $(Build.SourcesDirectory)
+      checkoutPath: ./asd
       preDeploy:
         - checkout: templates
         - script: ls
