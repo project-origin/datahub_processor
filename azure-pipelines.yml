@@ -21,9 +21,9 @@ variables:
     value: 'projectorigin/$(releaseName)'
   - template: vars.yml@templates
   ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
-    - group: production-values
+  - group: production-values
   ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
-    - group: $(Build.SourceBranchName)-values
+  - group: $(Build.SourceBranchName)-values
 
 pool:
   vmImage: 'ubuntu-latest'
