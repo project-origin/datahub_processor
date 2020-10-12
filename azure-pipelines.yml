@@ -86,17 +86,17 @@ jobs:
       releaseName: $(releaseName)
       deploymentEnvironment: $(deploymentEnvironment)
       overrideValues: tag=$(tag)
-      checkoutPath: $(Agent.BuildDirectory)/asd
+      checkoutPath: $(Agent.BuildDirectory)/s/asd
       preDeploy:
         - checkout: templates
-          path: $(Agent.BuildDirectory)/tplasd
+          path: $(Agent.BuildDirectory)/s/tplasd
         - script: asd1
           displayName: ls1
         - script: ls
           displayName: ls1
         - script: ls $(Agent.BuildDirectory)
           displayName: ls3
-        - script: dir $(Agent.BuildDirectory)
+        - script: ls $(Agent.BuildDirectory)/s
           displayName: dir
         - script: ls pipeline-templates
           displayName: ls2
