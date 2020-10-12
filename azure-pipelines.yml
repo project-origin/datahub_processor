@@ -37,8 +37,7 @@ jobs:
     steps:
       - checkout: self
       - checkout: templates
-      - script: ls
-        displayName: ls folder
+        path: pipeline-templates
 #  - job: run_pytest
 #    displayName: Test
 #    steps:
