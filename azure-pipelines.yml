@@ -89,7 +89,7 @@ jobs:
       checkoutPath: ./asd
       preDeploy:
         - checkout: templates
-          path: ./s/tplasd
+          path: $(System.DefaultWorkingDirectory)/tplasd
         - script: ls
           displayName: ls1
         - script: ls $(Build.SourcesDirectory)
