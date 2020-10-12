@@ -90,6 +90,7 @@ jobs:
       checkoutPath: ./asd
       preDeploy:
         - checkout: templates
+          path: tplasd
         - script: ls
           displayName: ls1
         - script: ls pipeline-templates
