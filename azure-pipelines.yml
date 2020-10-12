@@ -13,7 +13,6 @@ resources:
       type: github
       endpoint: project-origin
       name: project-origin/pipeline-templates
-      path: pipeline-templates
 
 variables:
   - name: releaseName
