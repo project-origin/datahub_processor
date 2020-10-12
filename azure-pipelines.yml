@@ -38,11 +38,11 @@ jobs:
       - checkout: templates
 
   # Ledger has custom pytest job, since it requires sawtooth to be installed.
-#  - job: run_pytest
-#    displayName: Test
-#    steps:
-#      - script: git submodule update --init --recursive
-#        displayName: Git get submodules
+  - job: run_pytest
+    displayName: Test
+    steps:
+      - script: git submodule update --init --recursive
+        displayName: Git get submodules
 #
 #      - script: echo "##vso[task.setvariable variable=tag]$(tag)$(git describe --tags --long | sed '0,/-/s/-/./')"
 #        displayName: Append tag with git describe
