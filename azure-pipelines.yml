@@ -19,7 +19,7 @@ variables:
   - name: releaseName
     value: 'ledger-tp'
   - name: checkoutPath
-    value: '$(Build.SourcesDirectory)/datahub_processor'
+    value: '$(System.DefaultWorkingDirectory)/datahub_processor'
   - name: imageName
     value: 'projectorigin/$(releaseName)'
   - template: vars.yml@templates
@@ -40,11 +40,11 @@ jobs:
 #      - checkout: templates
 
   # Ledger has custom pytest job, since it requires sawtooth to be installed.
-  - job: run_pytest
-    displayName: Test
-    steps:
-      - script: git submodule update --init --recursive
-        displayName: Git get submodules
+#  - job: run_pytest
+#    displayName: Test
+#    steps:
+#      - script: git submodule update --init --recursive
+#        displayName: Git get submodules
 #
 #      - script: echo "##vso[task.setvariable variable=tag]$(tag)$(git describe --tags --long | sed '0,/-/s/-/./')"
 #        displayName: Append tag with git describe
@@ -72,12 +72,12 @@ jobs:
 #
 #      - script: python -m pipenv run pytest -m unittest --cov-report=term-missing --cov-fail-under=100 --cov=src/datahub_processor
 #        displayName: 'Run tests'
-
-  - template: job-docker-build.yml@templates
-    parameters:
-      dependsOn: run_pytest
-      imageName: $(imageName)
-      tag: $(tag)
+#
+#  - template: job-docker-build.yml@templates
+#    parameters:
+#      dependsOn: run_pytest
+#      imageName: $(imageName)
+#      tag: $(tag)
 
   - template: job-deploy.yml@templates
     parameters:
