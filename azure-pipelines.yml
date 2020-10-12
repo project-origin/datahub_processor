@@ -20,7 +20,7 @@ variables:
   - name: imageName
     value: 'projectorigin/$(releaseName)'
   - template: vars.yml@templates
-  - group: $(Build.SourceBranchName)-values
+  - group: develop-values
 #  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
 #    - group: production-values
 #  ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
