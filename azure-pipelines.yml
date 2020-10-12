@@ -87,7 +87,7 @@ jobs:
       releaseName: $(releaseName)
       deploymentEnvironment: $(deploymentEnvironment)
       overrideValues: tag=$(tag)
-      checkoutPath: $(checkoutPath)
+#      checkoutPath: $(checkoutPath)
       preDeploy:
         - checkout: templates
           path: ./pipeline-templates
