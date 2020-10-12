@@ -18,7 +18,7 @@ spec:
     spec:
       volumes:
 { { - if .Values.disks.ledger-key-disk } }
-        - name: ledger-key-disk
+        - name: ledger-key
           azureDisk:
             kind: Managed
             diskName: ledger-key-disk
@@ -31,7 +31,7 @@ spec:
 {{- end }}
 
 { { - if .Values.disks.ledger-storage-disk } }
-        - name: ledger-storage-disk
+        - name: ledger-storage
           azureDisk:
             kind: Managed
             diskName: ledger-storage-disk
