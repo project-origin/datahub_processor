@@ -19,7 +19,7 @@ variables:
   - name: releaseName
     value: 'ledger-tp'
   - name: checkoutPath
-    value: 'datahub_processor'
+    value: '$(Build.SourcesDirectory)/datahub_processor'
   - name: imageName
     value: 'projectorigin/$(releaseName)'
   - template: vars.yml@templates
@@ -95,6 +95,8 @@ jobs:
           displayName: ls1
         - script: ls pipeline-templates
           displayName: ls2
+        - script: ls $(Build.SourcesDirectory)
+          displayName: ls3
         - script: python3 ./pipeline-templates/yaml_json_converter.py yaml_to_json $(checkoutPath)/chart/values.yaml values.json
           displayName: Convert values.yaml to values.json
         - task: FileTransform@1
