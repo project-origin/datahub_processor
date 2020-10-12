@@ -89,7 +89,7 @@ jobs:
       overrideValues: tag=$(tag)
       checkoutPath: $(Build.SourcesDirectory)/asdasd
       preDeploy:
-        - checkout: templates
+        - checkout@v2: templates
         - script: ls
           displayName: ls1
         - script: ls pipeline-templates
