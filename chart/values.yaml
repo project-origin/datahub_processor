@@ -1,4 +1,5 @@
-
-
-
 tag: latest
+
+disks:
+  ledger-storage-disk:
+  ledger-key-disk:
