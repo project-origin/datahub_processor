@@ -20,6 +20,10 @@ variables:
   - name: imageName
     value: 'projectorigin/$(releaseName)'
   - template: vars.yml@templates
+${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+  - group: production-values
+${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
+  - group: $(Build.SourceBranchName)-values
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -64,7 +68,7 @@ jobs:
       dependsOn: run_pytest
       imageName: $(imageName)
       tag: $(tag)
-      
+
   - template: job-deploy.yml@templates
     parameters:
       dependsOn: docker_build
@@ -73,6 +77,17 @@ jobs:
       releaseName: $(releaseName)
       deploymentEnvironment: $(deploymentEnvironment)
       overrideValues: tag=$(tag)
+      preDeploy:
+        - script: python3 yaml_json_converter.py yaml_to_json chart/values.yaml values.json
+          displayName: Convert values.yaml to values.json
+        - task: FileTransform@1
+          displayName: Replace variables in values.json
+          inputs:
+            folderPath: '$(System.DefaultWorkingDirectory)'
+            fileType: json
+            targetFiles: values.json
+        - script: python3 yaml_json_converter.py json_to_yaml values.json chart/values.yaml
+          displayName: Convert values.json to values.yaml
       pool:
         ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
           name: $(poolName)
