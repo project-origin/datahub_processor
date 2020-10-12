@@ -92,9 +92,9 @@ jobs:
           path: ./tplasd
         - script: ls
           displayName: ls1
-        - script: ls $(Build.SourcesDirectory)
+        - script: ls $(Build.SourcesDirectory)/s
           displayName: ls3
-        - script: dir $(Build.SourcesDirectory)
+        - script: dir $(Build.SourcesDirectory)/s
           displayName: dir
         - script: ls pipeline-templates
           displayName: ls2
