@@ -92,8 +92,8 @@ jobs:
       preDeploy:
         - checkout: templates
           path: s/pipeline-templates
-#        - script: ls
-#          displayName: ls1
+        - script: echo Tag $(tag)
+          displayName: asd
 #        - script: ls $(Agent.BuildDirectory)
 #          displayName: ls3
 #        - script: ls $(Agent.BuildDirectory)/s
