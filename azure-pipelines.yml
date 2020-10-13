@@ -19,6 +19,8 @@ variables:
     value: 'ledger-tp'
   - name: checkoutFolder
     value: 'datahub_processor'
+  - name: templatesFolder
+    value: 'pipeline-templates'
   - name: imageName
     value: 'projectorigin/$(releaseName)'
   - template: vars.yml@templates
@@ -80,7 +82,7 @@ jobs:
 
   - template: job-deploy.yml@templates
     parameters:
-#      dependsOn: docker_build
+      dependsOn: docker_build
       kubeCon: $(kubeCon)
       namespace: $(namespace)
       releaseName: $(releaseName)
@@ -98,7 +100,7 @@ jobs:
 #          displayName: dir
 #        - script: ls pipeline-templates
 #          displayName: ls2
-        - script: python3 pipeline-templates/yaml_json_converter.py yaml_to_json $(checkoutFolder)/chart/values.yaml values.json
+        - script: python3 $(templatesFolder)/yaml_json_converter.py yaml_to_json $(checkoutFolder)/chart/values.yaml values.json
           displayName: Convert values.yaml to values.json
         - task: FileTransform@1
           displayName: Replace variables in values.json
@@ -106,7 +108,7 @@ jobs:
             folderPath: '$(System.DefaultWorkingDirectory)'
             fileType: json
             targetFiles: values.json
-        - script: python3 ./pipeline-templates/yaml_json_converter.py json_to_yaml values.json $(checkoutFolder)/chart/values.yaml
+        - script: python3 $(templatesFolder)/yaml_json_converter.py json_to_yaml values.json $(checkoutFolder)/chart/values.yaml
           displayName: Convert values.json to values.yaml
       pool:
         ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
