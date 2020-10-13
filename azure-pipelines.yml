@@ -47,7 +47,7 @@ jobs:
       - script: git submodule update --init --recursive
         displayName: Git get submodules
 
-      - script: cd ${{ parameters.checkoutFolder }} && echo "##vso[task.setvariable variable=tag]$(tag)$(git describe --tags --long | sed '0,/-/s/-/./')" && cd ..
+      - script: cd $(checkoutFolder) && echo "##vso[task.setvariable variable=tag]$(tag)$(git describe --tags --long | sed '0,/-/s/-/./')" && cd ..
         displayName: Append tag with git describe
 
       - script: sudo mkdir -p /etc/sawtooth && sudo chmod 777 /etc/sawtooth &&
