@@ -17,31 +17,43 @@ spec:
         app: hyperledger-deployment
     spec:
       volumes:
-{{ if (index .Values.disks "ledger-key-disk") }}
         - name: ledger-key
           azureDisk:
             kind: Managed
             diskName: ledger-key-disk
             diskURI: {{ index .Values.disks "ledger-key-disk" }}
             fsType: ext4
-{{ else }}
-        - name: ledger-key
-          persistentVolumeClaim:
-            claimName: ledger-key-disk
-{{ end }}
+#{{ if (index .Values.disks "ledger-key-disk") }}
+#        - name: ledger-key
+#          azureDisk:
+#            kind: Managed
+#            diskName: ledger-key-disk
+#            diskURI: {{ index .Values.disks "ledger-key-disk" }}
+#            fsType: ext4
+#{{ else }}
+#        - name: ledger-key
+#          persistentVolumeClaim:
+#            claimName: ledger-key-disk
+#{{ end }}
 
-{{ if (index .Values.disks "ledger-storage-disk") }}
         - name: ledger-storage
           azureDisk:
             kind: Managed
             diskName: ledger-storage-disk
             diskURI: {{ index .Values.disks "ledger-storage-disk" }}
             fsType: ext4
-{{ else }}
-        - name: ledger-storage
-          persistentVolumeClaim:
-            claimName: ledger-storage-disk
-{{ end }}
+#{{ if (index .Values.disks "ledger-storage-disk") }}
+#        - name: ledger-storage
+#          azureDisk:
+#            kind: Managed
+#            diskName: ledger-storage-disk
+#            diskURI: {{ index .Values.disks "ledger-storage-disk" }}
+#            fsType: ext4
+#{{ else }}
+#        - name: ledger-storage
+#          persistentVolumeClaim:
+#            claimName: ledger-storage-disk
+#{{ end }}
 
       containers:
         - name: rest-api
