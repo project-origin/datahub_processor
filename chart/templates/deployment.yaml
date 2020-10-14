@@ -23,15 +23,15 @@ spec:
 #            diskName: ledger-key-disk
 #            diskURI: {{ index .Values.disks "ledger-key-disk" }}
 #            fsType: ext4
-{{ if (index .Values.disks "ledger-key-disk") }}
-        - name: ledger-key2
+{{ if and (index .Values.disks "ledger-key-disk" "name") (index .Values.disks "ledger-key-disk" "uri") }}
+        - name: ledger-key
           azureDisk:
             kind: Managed
-            diskName: ledger-key-disk
-            diskURI: {{ index .Values.disks "ledger-key-disk" }}
+            diskName: { { index .Values.disks "ledger-key-disk" "name" } }
+            diskURI: { { index .Values.disks "ledger-key-disk" "uri" } }
             fsType: ext4
 {{ else }}
-        - name: ledger-key2
+        - name: ledger-key
           persistentVolumeClaim:
             claimName: ledger-key-disk
 {{ end }}
@@ -42,15 +42,15 @@ spec:
 #            diskName: ledger-storage-disk
 #            diskURI: {{ index .Values.disks "ledger-storage-disk" }}
 #            fsType: ext4
-{{ if (index .Values.disks "ledger-storage-disk") }}
-        - name: ledger-storage2
+{ { if and (index .Values.disks "ledger-storage-disk" "name") (index .Values.disks "ledger-storage-disk" "uri") } }
+        - name: ledger-storage
           azureDisk:
             kind: Managed
-            diskName: ledger-storage-disk
-            diskURI: {{ index .Values.disks "ledger-storage-disk" }}
+            diskName: {{ index .Values.disks "ledger-storage-disk" "name" }}
+            diskURI: {{ index .Values.disks "ledger-storage-disk" "uri" }}
             fsType: ext4
 {{ else }}
-        - name: ledger-storage2
+        - name: ledger-storage
           persistentVolumeClaim:
             claimName: ledger-storage-disk
 {{ end }}
@@ -105,9 +105,9 @@ spec:
             - name: validators
               containerPort: 8800
           volumeMounts:
-            - name: ledger-key2
+            - name: ledger-key
               mountPath: /etc/sawtooth/keys
-            - name: ledger-storage2
+            - name: ledger-storage
               mountPath: /var/lib/sawtooth
           command:
             - bash
