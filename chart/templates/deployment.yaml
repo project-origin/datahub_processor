@@ -105,9 +105,9 @@ spec:
             - name: validators
               containerPort: 8800
           volumeMounts:
-            - name: ledger-key
+            - name: ledger-key2
               mountPath: /etc/sawtooth/keys
-            - name: ledger-storage
+            - name: ledger-storage2
               mountPath: /var/lib/sawtooth
           command:
             - bash
