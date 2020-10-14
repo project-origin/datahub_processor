@@ -24,14 +24,14 @@ spec:
 #            diskURI: {{ index .Values.disks "ledger-key-disk" }}
 #            fsType: ext4
 {{ if (index .Values.disks "ledger-key-disk") }}
-        - name: ledger-key
+        - name: ledger-key2
           azureDisk:
             kind: Managed
             diskName: ledger-key-disk
             diskURI: {{ index .Values.disks "ledger-key-disk" }}
             fsType: ext4
 {{ else }}
-        - name: ledger-key
+        - name: ledger-key2
           persistentVolumeClaim:
             claimName: ledger-key-disk
 {{ end }}
@@ -43,14 +43,14 @@ spec:
 #            diskURI: {{ index .Values.disks "ledger-storage-disk" }}
 #            fsType: ext4
 {{ if (index .Values.disks "ledger-storage-disk") }}
-        - name: ledger-storage
+        - name: ledger-storage2
           azureDisk:
             kind: Managed
             diskName: ledger-storage-disk
             diskURI: {{ index .Values.disks "ledger-storage-disk" }}
             fsType: ext4
 {{ else }}
-        - name: ledger-storage
+        - name: ledger-storage2
           persistentVolumeClaim:
             claimName: ledger-storage-disk
 {{ end }}
