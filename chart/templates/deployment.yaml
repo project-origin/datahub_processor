@@ -42,7 +42,7 @@ spec:
 #            diskName: ledger-storage-disk
 #            diskURI: {{ index .Values.disks "ledger-storage-disk" }}
 #            fsType: ext4
-{ { if and (index .Values.disks "ledger-storage-disk" "name") (index .Values.disks "ledger-storage-disk" "uri") } }
+{{ if and (index .Values.disks "ledger-storage-disk" "name") (index .Values.disks "ledger-storage-disk" "uri") }}
         - name: ledger-storage
           azureDisk:
             kind: Managed
