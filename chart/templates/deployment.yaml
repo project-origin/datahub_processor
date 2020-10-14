@@ -17,7 +17,7 @@ spec:
         app: hyperledger-deployment
     spec:
       volumes:
-{{ if index .Values.disks "ledger-key-disk" }}
+{{ if (index .Values.disks "ledger-key-disk") }}
         - name: ledger-key
           azureDisk:
             kind: Managed
@@ -30,7 +30,7 @@ spec:
             claimName: ledger-key-disk
 {{ end }}
 
-{{ if index .Values.disks "ledger-storage-disk" }}
+{{ if (index .Values.disks "ledger-storage-disk") }}
         - name: ledger-storage
           azureDisk:
             kind: Managed
