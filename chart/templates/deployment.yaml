@@ -23,12 +23,12 @@ spec:
 #            diskName: ledger-key-disk
 #            diskURI: {{ index .Values.disks "ledger-key-disk" }}
 #            fsType: ext4
-{{ if and (index .Values.disks "ledger-key-disk" name) (index .Values.disks "ledger-key-disk" uri) }}
+{{ if and (index .Values.disks "ledger-key-disk" "name") (index .Values.disks "ledger-key-disk" "uri") }}
         - name: ledger-key
           azureDisk:
             kind: Managed
-            diskName: { { index .Values.disks "ledger-key-disk" name } }
-            diskURI: { { index .Values.disks "ledger-key-disk" uri } }
+            diskName: {{ index .Values.disks "ledger-key-disk" "name" }}
+            diskURI: {{ index .Values.disks "ledger-key-disk" "uri" }}
             fsType: ext4
 {{ else }}
         - name: ledger-key
@@ -42,12 +42,12 @@ spec:
 #            diskName: ledger-storage-disk
 #            diskURI: {{ index .Values.disks "ledger-storage-disk" }}
 #            fsType: ext4
-{{ if and (index .Values.disks "ledger-storage-disk" name) (index .Values.disks "ledger-storage-disk" uri) }}
+{{ if and (index .Values.disks "ledger-storage-disk" "name") (index .Values.disks "ledger-storage-disk" "uri") }}
         - name: ledger-storage
           azureDisk:
             kind: Managed
-            diskName: {{ index .Values.disks "ledger-storage-disk" name }}
-            diskURI: {{ index .Values.disks "ledger-storage-disk" uri }}
+            diskName: {{ index .Values.disks "ledger-storage-disk" "name" }}
+            diskURI: {{ index .Values.disks "ledger-storage-disk" "uri" }}
             fsType: ext4
 {{ else }}
         - name: ledger-storage
