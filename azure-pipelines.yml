@@ -26,11 +26,6 @@ variables:
     value: 'projectorigin/$(releaseName)'
   - template: vars.yml@templates
   - template: helm-values.yml@templates
-#  - group: 'develop-values'
-#  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
-#    - group: production-values
-#  ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
-#    - group: $(Build.SourceBranchName)-values
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -94,14 +89,6 @@ jobs:
       preDeploy:
         - checkout: templates
           path: s/pipeline-templates
-#        - script: echo Tag $(tag)
-#          displayName: asd
-#        - script: ls $(Agent.BuildDirectory)
-#          displayName: ls3
-#        - script: ls $(Agent.BuildDirectory)/s
-#          displayName: dir
-#        - script: ls pipeline-templates
-#          displayName: ls2
         - script: python3 $(templatesFolder)/yaml_json_converter.py yaml_to_json $(checkoutFolder)/chart/values.yaml values.json
           displayName: Convert values.yaml to values.json
         - task: FileTransform@1
