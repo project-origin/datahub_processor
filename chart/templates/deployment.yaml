@@ -69,13 +69,13 @@ spec:
               tcp://${HOSTNAME}:4004
               --bind
               0.0.0.0:8008
-          resources:
-            requests:
-              memory: "100Mi"
-              cpu: "250m"
-            limits:
-              memory: "1000Mi"
-              cpu: "1000m"
+#          resources:
+#            requests:
+#              memory: "100Mi"
+#              cpu: "250m"
+#            limits:
+#              memory: "1000Mi"
+#              cpu: "1000m"
 
         - name: settings-processor
           image: hyperledger/sawtooth-settings-tp:1.2.4
@@ -87,23 +87,23 @@ spec:
               -v
               -C 
               tcp://${HOSTNAME}:4004
-          resources:
-            requests:
-              memory: "100Mi"
-              cpu: "100m"
-            limits:
-              memory: "500Mi"
-              cpu: "500m"
+#          resources:
+#            requests:
+#              memory: "100Mi"
+#              cpu: "100m"
+#            limits:
+#              memory: "500Mi"
+#              cpu: "500m"
 
         - name: origin-processor-1
           image: projectorigin/ledger-tp:{{ .Values.tag }}
-          resources:
-            requests:
-              memory: "100Mi"
-              cpu: "1000m"
-            limits:
-              memory: "500Mi"
-              cpu: "2000m"
+#          resources:
+#            requests:
+#              memory: "100Mi"
+#              cpu: "1000m"
+#            limits:
+#              memory: "500Mi"
+#              cpu: "2000m"
 
         - name: engine
           image: hyperledger/sawtooth-devmode-engine-rust:1.2
@@ -115,13 +115,13 @@ spec:
               -vv
               -C 
               tcp://${HOSTNAME}:5050
-          resources:
-            requests:
-              memory: "100Mi"
-              cpu: "1000m"
-            limits:
-              memory: "500Mi"
-              cpu: "2000m"
+#          resources:
+#            requests:
+#              memory: "100Mi"
+#              cpu: "1000m"
+#            limits:
+#              memory: "500Mi"
+#              cpu: "2000m"
 
         - name: validator
           image: hyperledger/sawtooth-validator:1.2.4
@@ -160,10 +160,10 @@ spec:
                 --bind network:tcp://eth0:8800
                 --bind consensus:tcp://eth0:5050
                 --scheduler parallel;
-          resources:
-            requests:
-              memory: "8000Mi"
-              cpu: "1000m"
-            limits:
-              memory: "12000Mi"
-              cpu: "2000m"
+#          resources:
+#            requests:
+#              memory: "8000Mi"
+#              cpu: "1000m"
+#            limits:
+#              memory: "12000Mi"
+#              cpu: "2000m"
