@@ -2,8 +2,10 @@ tag: latest
 
 disks:
   ledger-storage-disk:
-    name:
+    name: 
     uri:
+    claim: ledger-storage-disk
   ledger-key-disk:
-    name:
+    name: 
     uri:
+    claim: ledger-key-disk

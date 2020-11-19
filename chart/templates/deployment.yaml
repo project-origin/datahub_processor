@@ -16,45 +16,6 @@ spec:
       labels:
         app: hyperledger-deployment
     spec:
-      volumes:
-#        - name: ledger-key
-#          azureDisk:
-#            kind: Managed
-#            diskName: ledger-key-disk
-#            diskURI: {{ index .Values.disks "ledger-key-disk" }}
-#            fsType: ext4
-{{ if and (index .Values.disks "ledger-key-disk" "name") (index .Values.disks "ledger-key-disk" "uri") }}
-        - name: ledger-key
-          azureDisk:
-            kind: Managed
-            diskName: {{ index .Values.disks "ledger-key-disk" "name" }}
-            diskURI: {{ index .Values.disks "ledger-key-disk" "uri" }}
-            fsType: ext4
-{{ else }}
-        - name: ledger-key
-          persistentVolumeClaim:
-            claimName: ledger-key-disk
-{{ end }}
-
-#        - name: ledger-storage
-#          azureDisk:
-#            kind: Managed
-#            diskName: ledger-storage-disk
-#            diskURI: {{ index .Values.disks "ledger-storage-disk" }}
-#            fsType: ext4
-{{ if and (index .Values.disks "ledger-storage-disk" "name") (index .Values.disks "ledger-storage-disk" "uri") }}
-        - name: ledger-storage
-          azureDisk:
-            kind: Managed
-            diskName: {{ index .Values.disks "ledger-storage-disk" "name" }}
-            diskURI: {{ index .Values.disks "ledger-storage-disk" "uri" }}
-            fsType: ext4
-{{ else }}
-        - name: ledger-storage
-          persistentVolumeClaim:
-            claimName: ledger-storage-disk
-{{ end }}
-
       containers:
         - name: rest-api
           image: hyperledger/sawtooth-rest-api:1.2.4
@@ -132,11 +93,6 @@ spec:
               containerPort: 5050
             - name: validators
               containerPort: 8800
-          volumeMounts:
-            - name: ledger-key
-              mountPath: /etc/sawtooth/keys
-            - name: ledger-storage
-              mountPath: /var/lib/sawtooth
           command:
             - bash
             - -c
@@ -160,6 +116,16 @@ spec:
                 --bind network:tcp://eth0:8800
                 --bind consensus:tcp://eth0:5050
                 --scheduler parallel;
+
+          volumeMounts:
+{{- if or (index .Values.disks "ledger-key-disk" "name") (index .Values.disks "ledger-key-disk" "claim") }}
+            - name: ledger-key
+              mountPath: /etc/sawtooth/keys
+{{- end }}
+{{- if or (index .Values.disks "ledger-storage-disk" "name") (index .Values.disks "ledger-storage-disk" "claim") }}
+            - name: ledger-storage
+              mountPath: /var/lib/sawtooth
+{{- end }}
 #          resources:
 #            requests:
 #              memory: "8000Mi"
@@ -167,3 +133,43 @@ spec:
 #            limits:
 #              memory: "12000Mi"
 #              cpu: "2000m"
+
+
+      volumes:
+#        - name: ledger-key
+#          azureDisk:
+#            kind: Managed
+#            diskName: ledger-key-disk
+#            diskURI: {{ index .Values.disks "ledger-key-disk" }}
+#            fsType: ext4
+{{ if and (index .Values.disks "ledger-key-disk" "name") (index .Values.disks "ledger-key-disk" "uri") }}
+        - name: ledger-key
+          azureDisk:
+            kind: Managed
+            diskName: {{ index .Values.disks "ledger-key-disk" "name" }}
+            diskURI: {{ index .Values.disks "ledger-key-disk" "uri" }}
+            fsType: ext4
+{{ else if index .Values.disks "ledger-key-disk" "claim" }}
+        - name: ledger-key
+          persistentVolumeClaim:
+            claimName: {{ index .Values.disks "ledger-key-disk" "claim" }}
+{{ end }}
+
+#        - name: ledger-storage
+#          azureDisk:
+#            kind: Managed
+#            diskName: ledger-storage-disk
+#            diskURI: {{ index .Values.disks "ledger-storage-disk" }}
+#            fsType: ext4
+{{ if and (index .Values.disks "ledger-storage-disk" "name") (index .Values.disks "ledger-storage-disk" "uri") }}
+        - name: ledger-storage
+          azureDisk:
+            kind: Managed
+            diskName: {{ index .Values.disks "ledger-storage-disk" "name" }}
+            diskURI: {{ index .Values.disks "ledger-storage-disk" "uri" }}
+            fsType: ext4
+{{ else if (index .Values.disks "ledger-storage-disk" "claim") }}
+        - name: ledger-storage
+          persistentVolumeClaim:
+            claimName: {{ index .Values.disks "ledger-storage-disk" "claim" }}
+{{ end }}
